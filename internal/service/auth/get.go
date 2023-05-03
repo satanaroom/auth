@@ -5,11 +5,13 @@ import (
 	"fmt"
 
 	"github.com/satanaroom/auth/internal/model"
+	"github.com/satanaroom/auth/pkg/logger"
 )
 
-func (s *service) Get(ctx context.Context, username model.Username) (*model.User, error) {
+func (s *service) Get(ctx context.Context, username model.Username) (*model.UserRepo, error) {
 	user, err := s.authRepository.Get(ctx, string(username))
 	if err != nil {
+		logger.Errorf("authRepository.Get: %s", err.Error())
 		return nil, fmt.Errorf("authRepository.Get: %w", err)
 	}
 

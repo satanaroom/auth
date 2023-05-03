@@ -7,11 +7,13 @@ import (
 
 func ToInfo(info *desc.UserInfo, passwordConfirm string) *model.UserInfo {
 	return &model.UserInfo{
-		Username:        info.GetUsername(),
-		Email:           info.GetEmail(),
-		Password:        info.GetPassword(),
+		User: model.User{
+			Username: info.GetUsername(),
+			Email:    info.GetEmail(),
+			Password: info.GetPassword(),
+			Role:     int(info.GetRole().Number()),
+		},
 		PasswordConfirm: passwordConfirm,
-		Role:            int(info.GetRole().Number()),
 	}
 }
 func ToUsername(username string) model.Username {

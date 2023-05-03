@@ -3,25 +3,27 @@ package model
 import "time"
 
 const (
-	RoleAdmin = iota + 1
+	_Roles = iota
+	RoleAdmin
 	RoleUser
 )
 
-type UserInfo struct {
-	Username        string
-	Email           string
-	Password        string
-	PasswordConfirm string
-	Role            int
+type User struct {
+	Username string
+	Email    string
+	Password string
+	Role     int
 }
 
-type User struct {
+type UserInfo struct {
+	User            User
+	PasswordConfirm string
+}
+
+type UserRepo struct {
+	User      User
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Username  string
-	Email     string
-	Password  string
-	Role      int
 }
 
 type Username string

@@ -2,13 +2,6 @@ module github.com/satanaroom/auth
 
 go 1.19
 
-// 1. Написать прото декларацию нашего API
-// 2. Сгенерировать гошный год из прото
-// 3. Реализовать методы API
-// 4. Разбить проект на слои
-// 5. Поднять БД в докере
-// 6. Реализовать логику работы с БД
-
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/golang/protobuf v1.5.2

@@ -5,14 +5,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
-
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"time"
 
+	"github.com/satanaroom/auth/internal/errs"
 	"github.com/satanaroom/auth/internal/model"
-	"github.com/satanaroom/auth/pkg/errs"
 )
 
 var _ Repository = (*repository)(nil)
@@ -21,7 +20,7 @@ const tableName = "users"
 
 type Repository interface {
 	Create(ctx context.Context, info *model.UserInfo) (int64, error)
-	Get(ctx context.Context, username string) (*model.User, error)
+	Get(ctx context.Context, username string) (*model.UserRepo, error)
 	Update(ctx context.Context, username string, user *model.User) (int64, error)
 	Delete(ctx context.Context, username string) (int64, error)
 }
@@ -42,7 +41,7 @@ func (r *repository) Create(ctx context.Context, info *model.UserInfo) (int64, e
 	builder := sq.Insert(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Columns("username", "email", "password", "role", "created_at", "updated_at").
-		Values(info.Username, info.Email, info.Password, info.Role, t, t).
+		Values(info.User.Username, info.User.Email, info.User.Password, info.User.Role, t, t).
 		Suffix("RETURNING id")
 
 	query, v, err := builder.ToSql()
@@ -50,18 +49,21 @@ func (r *repository) Create(ctx context.Context, info *model.UserInfo) (int64, e
 		return 0, fmt.Errorf("to sql: %w", err)
 	}
 
-	var id sql.NullInt64
+	var id int64
 	if err = r.pool.QueryRow(ctx, query, v...).Scan(&id); err != nil {
 		return 0, fmt.Errorf("query row: %w", err)
 	}
 
-	return id.Int64, nil
+	return id, nil
 }
 
-func (r *repository) Get(ctx context.Context, username string) (*model.User, error) {
+func (r *repository) Get(ctx context.Context, username string) (*model.UserRepo, error) {
 	builder := sq.Select("username", "email", "password", "role", "created_at", "updated_at").
 		From(tableName).
-		Where("username = $1", username)
+		Where(sq.Eq{
+			"username": username,
+		}).
+		Limit(1)
 
 	query, v, err := builder.ToSql()
 	if err != nil {
@@ -80,20 +82,24 @@ func (r *repository) Get(ctx context.Context, username string) (*model.User, err
 		return nil, fmt.Errorf("query row: %w", err)
 	}
 
-	return &model.User{
+	return &model.UserRepo{
+		User: model.User{
+			Username: name.String,
+			Email:    email.String,
+			Password: password.String,
+			Role:     int(role.Int32),
+		},
 		CreatedAt: createdAt.Time,
 		UpdatedAt: updatedAt.Time,
-		Username:  name.String,
-		Email:     email.String,
-		Password:  password.String,
-		Role:      int(role.Int32),
 	}, nil
 }
 
 func (r *repository) Delete(ctx context.Context, username string) (int64, error) {
 	builder := sq.Delete(tableName).
 		PlaceholderFormat(sq.Dollar).
-		Where("username = $1", username).
+		Where(sq.Eq{
+			"username": username,
+		}).
 		Suffix("RETURNING id")
 
 	query, v, err := builder.ToSql()
@@ -101,22 +107,21 @@ func (r *repository) Delete(ctx context.Context, username string) (int64, error)
 		return 0, fmt.Errorf("to sql: %w", err)
 	}
 
-	var id sql.NullInt64
-	if err = r.pool.QueryRow(ctx, query, v...).Scan(&id); err != nil {
+	res, err := r.pool.Exec(ctx, query, v...)
+	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return 0, errs.ErrUserNotFound
 		}
 		return 0, fmt.Errorf("query row: %w", err)
 	}
 
-	return id.Int64, nil
+	return res.RowsAffected(), nil
 }
 
 func (r *repository) Update(ctx context.Context, username string, user *model.User) (int64, error) {
 	t := time.Now().UTC()
 
-	var id sql.NullInt64
-
+	var id int64
 	if err := r.pool.QueryRow(ctx, "SELECT id FROM users WHERE username = $1", username).Scan(&id); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return 0, fmt.Errorf("query row: %w", errs.ErrUserNotFound)
@@ -139,7 +144,9 @@ func (r *repository) Update(ctx context.Context, username string, user *model.Us
 		builder = builder.Set("role", user.Role)
 	}
 	builder = builder.Set("updated_at", t).
-		Where("username = $4", username)
+		Where(sq.Eq{
+			"username": username,
+		})
 
 	query, v, err := builder.ToSql()
 	if err != nil {
@@ -150,5 +157,5 @@ func (r *repository) Update(ctx context.Context, username string, user *model.Us
 		return 0, fmt.Errorf("exec: %w", err)
 	}
 
-	return id.Int64, nil
+	return id, nil
 }
