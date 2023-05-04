@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/joho/godotenv"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/joho/godotenv"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	authV1 "github.com/satanaroom/auth/internal/api/auth_v1"
 	noteRepository "github.com/satanaroom/auth/internal/repository/auth"

@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
+
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"time"
 
 	"github.com/satanaroom/auth/internal/errs"
 	"github.com/satanaroom/auth/internal/model"
@@ -87,7 +88,7 @@ func (r *repository) Get(ctx context.Context, username string) (*model.UserRepo,
 			Username: name.String,
 			Email:    email.String,
 			Password: password.String,
-			Role:     int(role.Int32),
+			Role:     model.Role(role.Int32),
 		},
 		CreatedAt: createdAt.Time,
 		UpdatedAt: updatedAt.Time,
