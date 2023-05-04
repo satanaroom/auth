@@ -24,21 +24,21 @@ func getLogger() *logrus.Entry {
 }
 
 func Infof(message string, args ...interface{}) {
-	getLogger().Infof(message, args)
+	getLogger().Infof(message, args...)
+}
+
+func Errorf(message string, args ...interface{}) {
+	getLogger().Errorf(message, args...)
+}
+
+func Debugf(message string, args ...interface{}) {
+	getLogger().Debugf(message, args...)
+}
+
+func Fatalf(message string, args ...interface{}) {
+	getLogger().Fatalf(message, args...)
 }
 
 func Info(message string) {
 	getLogger().Info(message)
-}
-
-func Errorf(message string, args ...interface{}) {
-	getLogger().Errorf(message, args)
-}
-
-func Debugf(message string, args ...interface{}) {
-	getLogger().Debugf(message, args)
-}
-
-func Fatalf(message string, args ...interface{}) {
-	getLogger().Fatalf(message, args)
 }
