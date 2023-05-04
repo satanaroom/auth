@@ -14,12 +14,12 @@ func (i *Implementation) Delete(ctx context.Context, req *desc.DeleteRequest) (*
 		return nil, status.Errorf(codes.InvalidArgument, "validate request: %s", err.Error())
 	}
 
-	id, err := i.authService.Delete(ctx, converter.ToUsername(req.GetUsername()))
+	affectedRows, err := i.authService.Delete(ctx, converter.ToUsername(req.GetUsername()))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to delete user: %s", err.Error())
 	}
 
 	return &desc.DeleteResponse{
-		Id: id,
+		AffectedRows: affectedRows,
 	}, nil
 }
