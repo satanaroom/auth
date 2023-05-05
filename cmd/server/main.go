@@ -10,12 +10,12 @@ import (
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/joho/godotenv"
+	authRepository "github.com/satanaroom/auth/internal/repository/auth"
+	authService "github.com/satanaroom/auth/internal/service/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
 	authV1 "github.com/satanaroom/auth/internal/api/auth_v1"
-	noteRepository "github.com/satanaroom/auth/internal/repository/auth"
-	noteService "github.com/satanaroom/auth/internal/service/auth"
 	desc "github.com/satanaroom/auth/pkg/auth_v1"
 	"github.com/satanaroom/auth/pkg/logger"
 )
@@ -60,8 +60,8 @@ func main() {
 		logger.Fatalf("ping database: %s", err.Error())
 	}
 
-	authRepo := noteRepository.NewRepository(dbc)
-	authSrv := noteService.NewService(authRepo)
+	authRepo := authRepository.NewRepository(dbc)
+	authSrv := authService.NewService(authRepo)
 
 	desc.RegisterAuthV1Server(s, authV1.NewImplementation(authSrv))
 
