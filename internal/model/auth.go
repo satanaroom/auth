@@ -2,17 +2,18 @@ package model
 
 import "time"
 
+type Role int64
+
 const (
-	_Roles = iota
-	RoleAdmin
-	RoleUser
+	RoleAdmin Role = 1
+	RoleUser  Role = 2
 )
 
 type User struct {
 	Username string
 	Email    string
 	Password string
-	Role     int
+	Role     Role
 }
 
 type UserInfo struct {

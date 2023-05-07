@@ -39,7 +39,7 @@ func isValidPassword(password, confirm string) bool {
 	return password == confirm
 }
 
-func isValidRole(role int) bool {
+func isValidRole(role model.Role) bool {
 	if role != model.RoleAdmin && role != model.RoleUser {
 		return false
 	}

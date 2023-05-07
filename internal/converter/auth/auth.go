@@ -11,7 +11,7 @@ func ToInfo(info *desc.UserInfo, passwordConfirm string) *model.UserInfo {
 			Username: info.GetUsername(),
 			Email:    info.GetEmail(),
 			Password: info.GetPassword(),
-			Role:     int(info.GetRole().Number()),
+			Role:     model.Role(info.GetRole().Number()),
 		},
 		PasswordConfirm: passwordConfirm,
 	}
@@ -25,6 +25,6 @@ func ToUser(info *desc.UserInfo) *model.User {
 		Username: info.GetUsername(),
 		Email:    info.GetEmail(),
 		Password: info.GetPassword(),
-		Role:     int(info.GetRole().Number()),
+		Role:     model.Role(info.GetRole().Number()),
 	}
 }
