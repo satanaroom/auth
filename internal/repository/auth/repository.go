@@ -10,6 +10,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4"
 	"github.com/satanaroom/auth/internal/client/pg"
+	converter "github.com/satanaroom/auth/internal/converter/auth"
 
 	"github.com/satanaroom/auth/internal/errs"
 	"github.com/satanaroom/auth/internal/model"
@@ -21,8 +22,8 @@ const tableName = "users"
 
 type Repository interface {
 	Create(ctx context.Context, info *model.UserInfo) (int64, error)
-	Get(ctx context.Context, username string) (*model.UserRepo, error)
-	Update(ctx context.Context, username string, user *model.User) (int64, error)
+	Get(ctx context.Context, username string) (*model.UserService, error)
+	Update(ctx context.Context, username string, user *model.UpdateUser) (int64, error)
 	Delete(ctx context.Context, username string) (int64, error)
 }
 
@@ -63,8 +64,9 @@ func (r *repository) Create(ctx context.Context, info *model.UserInfo) (int64, e
 	return id, nil
 }
 
-func (r *repository) Get(ctx context.Context, username string) (*model.UserRepo, error) {
+func (r *repository) Get(ctx context.Context, username string) (*model.UserService, error) {
 	builder := sq.Select("username", "email", "password", "role", "created_at", "updated_at").
+		PlaceholderFormat(sq.Dollar).
 		From(tableName).
 		Where(sq.Eq{
 			"username": username,
@@ -75,7 +77,6 @@ func (r *repository) Get(ctx context.Context, username string) (*model.UserRepo,
 	if err != nil {
 		return nil, fmt.Errorf("to sql: %w", err)
 	}
-
 	var (
 		name      sql.NullString
 		email     sql.NullString
@@ -93,16 +94,16 @@ func (r *repository) Get(ctx context.Context, username string) (*model.UserRepo,
 		return nil, fmt.Errorf("query row ctx: %w", err)
 	}
 
-	return &model.UserRepo{
-		User: model.User{
-			Username: name.String,
-			Email:    email.String,
-			Password: password.String,
-			Role:     model.Role(role.Int32),
+	return converter.ToGetService(&model.UserRepo{
+		User: model.UpdateUser{
+			Username: name,
+			Email:    email,
+			Password: password,
+			Role:     role,
 		},
-		CreatedAt: createdAt.Time,
-		UpdatedAt: updatedAt.Time,
-	}, nil
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
+	}), nil
 }
 
 func (r *repository) Delete(ctx context.Context, username string) (int64, error) {
@@ -133,10 +134,11 @@ func (r *repository) Delete(ctx context.Context, username string) (int64, error)
 	return res.RowsAffected(), nil
 }
 
-func (r *repository) Update(ctx context.Context, username string, user *model.User) (int64, error) {
+func (r *repository) Update(ctx context.Context, username string, user *model.UpdateUser) (int64, error) {
 	t := time.Now().UTC()
 
 	selectBuilder := sq.Select("id").
+		PlaceholderFormat(sq.Dollar).
 		From(tableName).
 		Where(sq.Eq{
 			"username": username,
@@ -163,18 +165,10 @@ func (r *repository) Update(ctx context.Context, username string, user *model.Us
 
 	updateBuilder := sq.Update("users").
 		PlaceholderFormat(sq.Dollar)
-	if user.Username != "" {
-		updateBuilder = updateBuilder.Set("username", user.Username)
-	}
-	if user.Email != "" {
-		updateBuilder = updateBuilder.Set("email", user.Email)
-	}
-	if user.Password != "" {
-		updateBuilder = updateBuilder.Set("password", user.Password)
-	}
-	if user.Role != 0 {
-		updateBuilder = updateBuilder.Set("role", user.Role)
-	}
+	updateBuilder = updateBuilder.Set("username", user.Username)
+	updateBuilder = updateBuilder.Set("email", user.Email)
+	updateBuilder = updateBuilder.Set("password", user.Password)
+	updateBuilder = updateBuilder.Set("role", user.Role)
 	updateBuilder = updateBuilder.Set("updated_at", t).
 		Where(sq.Eq{
 			"username": username,

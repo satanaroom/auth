@@ -28,7 +28,7 @@ func newServiceProvider() *serviceProvider {
 	return &serviceProvider{}
 }
 
-func (s *serviceProvider) GetPGConfig() config.PGConfig {
+func (s *serviceProvider) PGConfig() config.PGConfig {
 	if s.pgConfig == nil {
 		cfg, err := config.NewPGConfig()
 		if err != nil {
@@ -56,7 +56,7 @@ func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
 
 func (s *serviceProvider) PGClient(ctx context.Context) pg.Client {
 	if s.pgClient == nil {
-		pgCfg, err := pgxpool.ParseConfig(s.GetPGConfig().DSN())
+		pgCfg, err := pgxpool.ParseConfig(s.PGConfig().DSN())
 		if err != nil {
 			logger.Fatalf("failed to get db config: %s", err.Error())
 		}

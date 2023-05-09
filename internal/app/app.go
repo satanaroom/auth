@@ -35,7 +35,7 @@ func (a *App) Run() error {
 	}()
 
 	if err := a.runGRPCServer(); err != nil {
-		return fmt.Errorf("run GRPC server: %w", err)
+		logger.Fatalf("run GRPC server: %w", err)
 	}
 	return nil
 }

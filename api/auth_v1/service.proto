@@ -3,6 +3,7 @@ syntax = "proto3";
 package auth_v1;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/satanaroom/auth;auth_v1";
 
@@ -26,6 +27,13 @@ message UserInfo {
   Role role = 4;
 }
 
+message UpdateUser {
+  google.protobuf.StringValue username = 1;
+  google.protobuf.StringValue email = 2;
+  google.protobuf.StringValue password = 3;
+  google.protobuf.Int32Value role = 4;
+}
+
 message CreateRequest {
   UserInfo info = 1;
   string password_confirm = 2;
@@ -47,7 +55,7 @@ message GetResponse {
 
 message UpdateRequest {
   string username = 1;
-  UserInfo info = 2;
+  UpdateUser info = 2;
 }
 
 message UpdateResponse {

@@ -8,7 +8,7 @@ import (
 	"github.com/satanaroom/auth/pkg/logger"
 )
 
-func (s *service) Get(ctx context.Context, username model.Username) (*model.UserRepo, error) {
+func (s *service) Get(ctx context.Context, username model.Username) (*model.UserService, error) {
 	user, err := s.authRepository.Get(ctx, string(username))
 	if err != nil {
 		logger.Errorf("authRepository.Get: %s", err.Error())
