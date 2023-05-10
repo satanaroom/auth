@@ -84,7 +84,7 @@ func (s *serviceProvider) AuthRepository(ctx context.Context) authRepository.Rep
 	return s.authRepository
 }
 
-func (s *serviceProvider) ServiceProvider(ctx context.Context) authService.Service {
+func (s *serviceProvider) AuthService(ctx context.Context) authService.Service {
 	if s.authService == nil {
 		s.authService = authService.NewService(s.AuthRepository(ctx))
 	}
@@ -94,7 +94,7 @@ func (s *serviceProvider) ServiceProvider(ctx context.Context) authService.Servi
 
 func (s *serviceProvider) AuthImpl(ctx context.Context) *authV1.Implementation {
 	if s.authImpl == nil {
-		s.authImpl = authV1.NewImplementation(s.ServiceProvider(ctx))
+		s.authImpl = authV1.NewImplementation(s.AuthService(ctx))
 	}
 
 	return s.authImpl
