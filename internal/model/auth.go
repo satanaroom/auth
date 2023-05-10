@@ -13,10 +13,10 @@ const (
 )
 
 type UpdateUser struct {
-	Username sql.NullString
-	Email    sql.NullString
-	Password sql.NullString
-	Role     sql.NullInt32
+	Username sql.NullString `db:"username"`
+	Email    sql.NullString `db:"email"`
+	Password sql.NullString `db:"password"`
+	Role     sql.NullInt32  `db:"role"`
 }
 
 type User struct {
@@ -32,9 +32,9 @@ type UserInfo struct {
 }
 
 type UserRepo struct {
-	User      UpdateUser
-	CreatedAt sql.NullTime
-	UpdatedAt sql.NullTime
+	User      UpdateUser   `db:""`
+	CreatedAt sql.NullTime `db:"created_at"`
+	UpdatedAt sql.NullTime `db:"updated_at"`
 }
 
 type UserService struct {

@@ -25,22 +25,36 @@ func ToUsername(username string) model.Username {
 }
 
 func ToUpdateUser(info *desc.UpdateUser) *model.UpdateUser {
+	var usernameValid, emailValid, passwordValid, roleValid bool
+	if info.Username.ProtoReflect().IsValid() {
+		usernameValid = true
+	}
+	if info.Email.ProtoReflect().IsValid() {
+		emailValid = true
+	}
+	if info.Password.ProtoReflect().IsValid() {
+		passwordValid = true
+	}
+	if info.Role.ProtoReflect().IsValid() {
+		roleValid = true
+	}
+
 	return &model.UpdateUser{
 		Username: sql.NullString{
 			String: info.Username.GetValue(),
-			Valid:  info.Username.ProtoReflect().IsValid(),
+			Valid:  usernameValid,
 		},
 		Email: sql.NullString{
 			String: info.Email.GetValue(),
-			Valid:  info.Email.ProtoReflect().IsValid(),
+			Valid:  emailValid,
 		},
 		Password: sql.NullString{
 			String: info.Password.GetValue(),
-			Valid:  info.Password.ProtoReflect().IsValid(),
+			Valid:  passwordValid,
 		},
 		Role: sql.NullInt32{
 			Int32: info.Role.GetValue(),
-			Valid: info.Role.ProtoReflect().IsValid(),
+			Valid: roleValid,
 		},
 	}
 }

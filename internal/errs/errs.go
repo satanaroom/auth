@@ -2,13 +2,13 @@ package errs
 
 import "errors"
 
-var ErrUsernameEmpty = errors.New("username is empty")
-var ErrPasswordEmpty = errors.New("password is empty")
-var ErrPasswordMismatch = errors.New("password and password confirm do not match")
-var ErrRoleInvalid = errors.New("role is invalid")
-var ErrEmailInvalid = errors.New("email is invalid")
-var ErrUserNotFound = errors.New("user not found")
-var ErrDSNNotFound = errors.New("pg dsn not found")
-var ErrGRPCPortNotFound = errors.New("grpc port not found")
-var ErrUsernameRequired = errors.New("username is required")
-var ErrRoleRequired = errors.New("role is required")
+var (
+	ErrUsernameEmpty    = errors.New("username is empty")
+	ErrPasswordEmpty    = errors.New("password is empty")
+	ErrPasswordMismatch = errors.New("password and password confirm do not match")
+	ErrRoleInvalid      = errors.New("role is invalid")
+	ErrEmailInvalid     = errors.New("email is invalid")
+	ErrUserNotFound     = errors.New("user not found")
+	ErrDSNNotFound      = errors.New("pg dsn not found")
+	ErrGRPCPortNotFound = errors.New("grpc port not found")
+)

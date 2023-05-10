@@ -10,17 +10,7 @@ import (
 )
 
 func (s *service) Update(ctx context.Context, username string, user *model.UpdateUser) (int64, error) {
-	if !user.Username.Valid {
-		logger.Errorf("username is required: %s", errs.ErrUsernameRequired.Error())
-		return 0, errs.ErrUsernameRequired
-	}
-
-	if !user.Role.Valid {
-		logger.Errorf("role is required: %s", errs.ErrRoleRequired.Error())
-		return 0, errs.ErrRoleRequired
-	}
-
-	if user.Role.Int32 != 0 && !isValidRole(model.Role(user.Role.Int32)) {
+	if user.Role.Valid && !isValidRole(model.Role(user.Role.Int32)) {
 		logger.Errorf("role is invalid: %s", errs.ErrRoleInvalid.Error())
 		return 0, errs.ErrRoleInvalid
 	}

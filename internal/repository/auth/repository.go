@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -77,33 +76,18 @@ func (r *repository) Get(ctx context.Context, username string) (*model.UserServi
 	if err != nil {
 		return nil, fmt.Errorf("to sql: %w", err)
 	}
-	var (
-		name      sql.NullString
-		email     sql.NullString
-		password  sql.NullString
-		role      sql.NullInt32
-		createdAt sql.NullTime
-		updatedAt sql.NullTime
-	)
+
 	q := pg.Query{
 		Name:     "auth.Get",
 		QueryRaw: query,
 	}
 
-	if err = r.pgClient.PG().QueryRowContext(ctx, q, v...).Scan(&name, &email, &password, &role, &createdAt, &updatedAt); err != nil {
-		return nil, fmt.Errorf("query row ctx: %w", err)
+	var user model.UserRepo
+	if err = r.pgClient.PG().ScanOne(ctx, &user, q, v...); err != nil {
+		return nil, fmt.Errorf("scan one: %w", err)
 	}
 
-	return converter.ToGetService(&model.UserRepo{
-		User: model.UpdateUser{
-			Username: name,
-			Email:    email,
-			Password: password,
-			Role:     role,
-		},
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
-	}), nil
+	return converter.ToGetService(&user), nil
 }
 
 func (r *repository) Delete(ctx context.Context, username string) (int64, error) {
@@ -165,10 +149,19 @@ func (r *repository) Update(ctx context.Context, username string, user *model.Up
 
 	updateBuilder := sq.Update("users").
 		PlaceholderFormat(sq.Dollar)
-	updateBuilder = updateBuilder.Set("username", user.Username)
-	updateBuilder = updateBuilder.Set("email", user.Email)
-	updateBuilder = updateBuilder.Set("password", user.Password)
-	updateBuilder = updateBuilder.Set("role", user.Role)
+
+	if user.Username.Valid {
+		updateBuilder = updateBuilder.Set("username", user.Username)
+	}
+	if user.Email.Valid {
+		updateBuilder = updateBuilder.Set("email", user.Email)
+	}
+	if user.Password.Valid {
+		updateBuilder = updateBuilder.Set("password", user.Password)
+	}
+	if user.Role.Valid {
+		updateBuilder = updateBuilder.Set("role", user.Role)
+	}
 	updateBuilder = updateBuilder.Set("updated_at", t).
 		Where(sq.Eq{
 			"username": username,
