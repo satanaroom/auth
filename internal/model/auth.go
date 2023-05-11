@@ -1,18 +1,29 @@
 package model
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
+
+type Role int64
 
 const (
-	_Roles = iota
-	RoleAdmin
-	RoleUser
+	RoleAdmin Role = 1
+	RoleUser  Role = 2
 )
+
+type UpdateUser struct {
+	Username sql.NullString `db:"username"`
+	Email    sql.NullString `db:"email"`
+	Password sql.NullString `db:"password"`
+	Role     sql.NullInt32  `db:"role"`
+}
 
 type User struct {
 	Username string
 	Email    string
 	Password string
-	Role     int
+	Role     Role
 }
 
 type UserInfo struct {
@@ -21,6 +32,12 @@ type UserInfo struct {
 }
 
 type UserRepo struct {
+	User      UpdateUser   `db:""`
+	CreatedAt sql.NullTime `db:"created_at"`
+	UpdatedAt sql.NullTime `db:"updated_at"`
+}
+
+type UserService struct {
 	User      User
 	CreatedAt time.Time
 	UpdatedAt time.Time

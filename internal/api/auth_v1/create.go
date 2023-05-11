@@ -2,6 +2,7 @@ package auth_v1
 
 import (
 	"context"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -30,7 +31,7 @@ func validateCreateRequest(info *desc.UserInfo, passwordConfirm string) error {
 	if info.GetUsername() == "" {
 		return errs.ErrUsernameEmpty
 	}
-	role := int(info.GetRole().Number())
+	role := model.Role(info.GetRole().Number())
 	if role != model.RoleAdmin && role != model.RoleUser {
 		return errs.ErrRoleInvalid
 	}

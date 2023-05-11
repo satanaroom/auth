@@ -2,6 +2,7 @@ package auth_v1
 
 import (
 	"context"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -14,7 +15,7 @@ func (i *Implementation) Update(ctx context.Context, req *desc.UpdateRequest) (*
 		return nil, status.Errorf(codes.InvalidArgument, "validate request: %s", err.Error())
 	}
 
-	id, err := i.authService.Update(ctx, req.GetUsername(), converter.ToUser(req.GetInfo()))
+	id, err := i.authService.Update(ctx, req.GetUsername(), converter.ToUpdateUser(req.GetInfo()))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to update user: %s", err.Error())
 	}
