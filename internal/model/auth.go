@@ -44,3 +44,7 @@ type UserService struct {
 }
 
 type Username string
+
+type UserId struct {
+	Id int64 `db:"id"`
+}
