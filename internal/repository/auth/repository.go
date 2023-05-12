@@ -55,12 +55,12 @@ func (r *repository) Create(ctx context.Context, info *model.UserInfo) (int64, e
 		QueryRaw: query,
 	}
 
-	var id int64
-	if err = r.pgClient.PG().QueryRowContext(ctx, q, v...).Scan(&id); err != nil {
+	var uId model.UserId
+	if err = r.pgClient.PG().ScanOne(ctx, &uId, q, v...); err != nil {
 		return 0, fmt.Errorf("query row ctx: %w", err)
 	}
 
-	return id, nil
+	return uId.Id, nil
 }
 
 func (r *repository) Get(ctx context.Context, username string) (*model.UserService, error) {
@@ -121,32 +121,6 @@ func (r *repository) Delete(ctx context.Context, username string) (int64, error)
 func (r *repository) Update(ctx context.Context, username string, user *model.UpdateUser) (int64, error) {
 	t := time.Now().UTC()
 
-	selectBuilder := sq.Select("id").
-		PlaceholderFormat(sq.Dollar).
-		From(tableName).
-		Where(sq.Eq{
-			"username": username,
-		}).
-		Limit(1)
-
-	query, v, err := selectBuilder.ToSql()
-	if err != nil {
-		return 0, fmt.Errorf("to sql: %w", err)
-	}
-
-	q := pg.Query{
-		Name:     "auth.UpdateGetId",
-		QueryRaw: query,
-	}
-
-	var id int64
-	if err = r.pgClient.PG().QueryRowContext(ctx, q, v...).Scan(&id); err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return 0, fmt.Errorf("query row ctx: %w", errs.ErrUserNotFound)
-		}
-		return 0, fmt.Errorf("query row ctx: %w", err)
-	}
-
 	updateBuilder := sq.Update("users").
 		PlaceholderFormat(sq.Dollar)
 
@@ -165,21 +139,23 @@ func (r *repository) Update(ctx context.Context, username string, user *model.Up
 	updateBuilder = updateBuilder.Set("updated_at", t).
 		Where(sq.Eq{
 			"username": username,
-		})
+		}).
+		Suffix("RETURNING id")
 
-	query, v, err = updateBuilder.ToSql()
+	query, v, err := updateBuilder.ToSql()
 	if err != nil {
 		return 0, fmt.Errorf("to sql: %w", err)
 	}
 
-	q = pg.Query{
+	q := pg.Query{
 		Name:     "auth.Update",
 		QueryRaw: query,
 	}
 
-	if _, err = r.pgClient.PG().ExecContext(ctx, q, v...); err != nil {
+	var uId model.UserId
+	if err = r.pgClient.PG().ScanOne(ctx, &uId, q, v...); err != nil {
 		return 0, fmt.Errorf("exec ctx: %w", err)
 	}
 
-	return id, nil
+	return uId.Id, nil
 }
