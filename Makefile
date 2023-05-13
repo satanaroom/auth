@@ -8,8 +8,21 @@ install-go-deps:
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 	GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2
+	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2
+	GOBIN=$(LOCAL_BIN) go install github.com/rakyll/statik@latest
 
-generate:
+swagger:
+	mkdir -p pkg/swagger
+
+generate: swagger generate-auth-api
+	statik -src=pkg/swagger/ -include='*.css,*html,*.json,*.png,*.js'
+
+
+#generate-auth-api:
+
+#generate-access-api:
+
+generate-auth-api:
 	mkdir -p pkg/auth_v1
 	protoc --proto_path api/auth_v1 --proto_path vendor.protogen \
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
@@ -20,6 +33,8 @@ generate:
     --plugin=protoc-gen-validate=bin/protoc-gen-validate \
     --grpc-gateway_out=pkg/auth_v1 --grpc-gateway_opt=paths=source_relative \
     --plugin=protoc-gen-go-grpc-gateway=bin/protoc-gen-go-grpc-gateway \
+    --openapiv2_out=allow_merge=true,merge_file_name=api:pkg/swagger \
+	--plugin=protoc-gen-openapiv2=bin/protoc-gen-openapiv2 \
 	api/auth_v1/service.proto
 
 vendor-proto:
@@ -34,6 +49,12 @@ vendor-proto:
 			mkdir -p  vendor.protogen/google/ &&\
 			mv vendor.protogen/googleapis/google/api vendor.protogen/google &&\
 			rm -rf vendor.protogen/googleapis ;\
+		fi
+		@if [ ! -d vendor.protogen/protoc-gen-openapiv2 ]; then \
+			mkdir -p vendor.protogen/protoc-gen-openapiv2/options &&\
+			git clone https://github.com/grpc-ecosystem/grpc-gateway vendor.protogen/openapiv2 &&\
+			mv vendor.protogen/openapiv2/protoc-gen-openapiv2/options/*.proto vendor.protogen/protoc-gen-openapiv2/options &&\
+			rm -rf vendor.protogen/openapiv2 ;\
 		fi
 
 .PHONY: local-migration-status

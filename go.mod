@@ -11,6 +11,8 @@ require (
 	github.com/jackc/pgconn v1.14.0
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/joho/godotenv v1.5.1
+	github.com/rakyll/statik v0.1.7
+	github.com/rs/cors v1.9.0
 	github.com/sirupsen/logrus v1.4.2
 	google.golang.org/genproto v0.0.0-20230223222841-637eb2293923
 	google.golang.org/grpc v1.54.0

@@ -6,8 +6,25 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/satanaroom/auth;auth_v1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Auth API"
+    version: "1.0.0"
+    contact: {
+      name: "Yan Karpov"
+      email: "ftragula@mail.ru"
+    };
+  };
+
+  host: "localhost:8080"
+  schemes: HTTP
+  schemes: HTTPS
+  consumes: "application/json"
+};
 
 service AuthV1 {
   rpc Create(CreateRequest) returns (CreateResponse) {
