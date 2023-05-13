@@ -11,4 +11,5 @@ var (
 	ErrUserNotFound     = errors.New("user not found")
 	ErrDSNNotFound      = errors.New("pg dsn not found")
 	ErrGRPCPortNotFound = errors.New("grpc port not found")
+	ErrHTTPPortNotFound = errors.New("http port not found")
 )
