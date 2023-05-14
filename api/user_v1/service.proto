@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package auth_v1;
+package user_v1;
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
@@ -8,11 +8,11 @@ import "validate/validate.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-option go_package = "github.com/satanaroom/auth;auth_v1";
+option go_package = "github.com/satanaroom/auth;user_v1";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "Auth API"
+    title: "User API"
     version: "1.0.0"
     contact: {
       name: "Yan Karpov"
@@ -26,10 +26,10 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/json"
 };
 
-service AuthV1 {
+service UserV1 {
   rpc Create(CreateRequest) returns (CreateResponse) {
     option (google.api.http) = {
-      post: "/auth/v1/create"
+      post: "/user/v1/create"
       body: "*"
     };
   };

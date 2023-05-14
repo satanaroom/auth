@@ -1,4 +1,4 @@
-package auth
+package user
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4"
 	"github.com/satanaroom/auth/internal/client/pg"
-	converter "github.com/satanaroom/auth/internal/converter/auth"
+	converter "github.com/satanaroom/auth/internal/converter/user"
 
 	"github.com/satanaroom/auth/internal/errs"
 	"github.com/satanaroom/auth/internal/model"
@@ -51,7 +51,7 @@ func (r *repository) Create(ctx context.Context, info *model.UserInfo) (int64, e
 	}
 
 	q := pg.Query{
-		Name:     "auth.Create",
+		Name:     "user.Create",
 		QueryRaw: query,
 	}
 
@@ -78,7 +78,7 @@ func (r *repository) Get(ctx context.Context, username string) (*model.UserServi
 	}
 
 	q := pg.Query{
-		Name:     "auth.Get",
+		Name:     "user.Get",
 		QueryRaw: query,
 	}
 
@@ -103,7 +103,7 @@ func (r *repository) Delete(ctx context.Context, username string) (int64, error)
 	}
 
 	q := pg.Query{
-		Name:     "auth.Delete",
+		Name:     "user.Delete",
 		QueryRaw: query,
 	}
 
@@ -148,7 +148,7 @@ func (r *repository) Update(ctx context.Context, username string, user *model.Up
 	}
 
 	q := pg.Query{
-		Name:     "auth.Update",
+		Name:     "user.Update",
 		QueryRaw: query,
 	}
 

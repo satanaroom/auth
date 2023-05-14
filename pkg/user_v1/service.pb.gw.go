@@ -2,11 +2,11 @@
 // source: service.proto
 
 /*
-Package auth_v1 is a reverse proxy.
+Package user_v1 is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package auth_v1
+package user_v1
 
 import (
 	"context"
@@ -31,7 +31,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
-func request_AuthV1_Create_0(ctx context.Context, marshaler runtime.Marshaler, client AuthV1Client, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_UserV1_Create_0(ctx context.Context, marshaler runtime.Marshaler, client UserV1Client, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateRequest
 	var metadata runtime.ServerMetadata
 
@@ -48,7 +48,7 @@ func request_AuthV1_Create_0(ctx context.Context, marshaler runtime.Marshaler, c
 
 }
 
-func local_request_AuthV1_Create_0(ctx context.Context, marshaler runtime.Marshaler, server AuthV1Server, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_UserV1_Create_0(ctx context.Context, marshaler runtime.Marshaler, server UserV1Server, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq CreateRequest
 	var metadata runtime.ServerMetadata
 
@@ -65,24 +65,24 @@ func local_request_AuthV1_Create_0(ctx context.Context, marshaler runtime.Marsha
 
 }
 
-// RegisterAuthV1HandlerServer registers the http handlers for service AuthV1 to "mux".
-// UnaryRPC     :call AuthV1Server directly.
+// RegisterUserV1HandlerServer registers the http handlers for service UserV1 to "mux".
+// UnaryRPC     :call UserV1Server directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterAuthV1HandlerFromEndpoint instead.
-func RegisterAuthV1HandlerServer(ctx context.Context, mux *runtime.ServeMux, server AuthV1Server) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterUserV1HandlerFromEndpoint instead.
+func RegisterUserV1HandlerServer(ctx context.Context, mux *runtime.ServeMux, server UserV1Server) error {
 
-	mux.Handle("POST", pattern_AuthV1_Create_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_UserV1_Create_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/auth_v1.AuthV1/Create", runtime.WithHTTPPathPattern("/auth/v1/create"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/user_v1.UserV1/Create", runtime.WithHTTPPathPattern("/user/v1/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_AuthV1_Create_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_UserV1_Create_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -90,16 +90,16 @@ func RegisterAuthV1HandlerServer(ctx context.Context, mux *runtime.ServeMux, ser
 			return
 		}
 
-		forward_AuthV1_Create_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserV1_Create_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterAuthV1HandlerFromEndpoint is same as RegisterAuthV1Handler but
+// RegisterUserV1HandlerFromEndpoint is same as RegisterUserV1Handler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterAuthV1HandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterUserV1HandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -119,39 +119,39 @@ func RegisterAuthV1HandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMu
 		}()
 	}()
 
-	return RegisterAuthV1Handler(ctx, mux, conn)
+	return RegisterUserV1Handler(ctx, mux, conn)
 }
 
-// RegisterAuthV1Handler registers the http handlers for service AuthV1 to "mux".
+// RegisterUserV1Handler registers the http handlers for service UserV1 to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterAuthV1Handler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterAuthV1HandlerClient(ctx, mux, NewAuthV1Client(conn))
+func RegisterUserV1Handler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterUserV1HandlerClient(ctx, mux, NewUserV1Client(conn))
 }
 
-// RegisterAuthV1HandlerClient registers the http handlers for service AuthV1
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "AuthV1Client".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "AuthV1Client"
+// RegisterUserV1HandlerClient registers the http handlers for service UserV1
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "UserV1Client".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "UserV1Client"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "AuthV1Client" to call the correct interceptors.
-func RegisterAuthV1HandlerClient(ctx context.Context, mux *runtime.ServeMux, client AuthV1Client) error {
+// "UserV1Client" to call the correct interceptors.
+func RegisterUserV1HandlerClient(ctx context.Context, mux *runtime.ServeMux, client UserV1Client) error {
 
-	mux.Handle("POST", pattern_AuthV1_Create_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_UserV1_Create_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/auth_v1.AuthV1/Create", runtime.WithHTTPPathPattern("/auth/v1/create"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/user_v1.UserV1/Create", runtime.WithHTTPPathPattern("/user/v1/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AuthV1_Create_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserV1_Create_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AuthV1_Create_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserV1_Create_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -159,9 +159,9 @@ func RegisterAuthV1HandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 }
 
 var (
-	pattern_AuthV1_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"auth", "v1", "create"}, ""))
+	pattern_UserV1_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"user", "v1", "create"}, ""))
 )
 
 var (
-	forward_AuthV1_Create_0 = runtime.ForwardResponseMessage
+	forward_UserV1_Create_0 = runtime.ForwardResponseMessage
 )

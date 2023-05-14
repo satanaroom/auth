@@ -1,4 +1,4 @@
-package auth_v1
+package user_v1
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	converter "github.com/satanaroom/auth/internal/converter/auth"
-	desc "github.com/satanaroom/auth/pkg/auth_v1"
+	converter "github.com/satanaroom/auth/internal/converter/user"
+	desc "github.com/satanaroom/auth/pkg/user_v1"
 )
 
 func (i *Implementation) Update(ctx context.Context, req *desc.UpdateRequest) (*desc.UpdateResponse, error) {

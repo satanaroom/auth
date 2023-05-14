@@ -1,18 +1,18 @@
-package auth_v1
+package user_v1
 
 import (
 	"github.com/satanaroom/auth/internal/errs"
-	"github.com/satanaroom/auth/internal/service/auth"
-	desc "github.com/satanaroom/auth/pkg/auth_v1"
+	"github.com/satanaroom/auth/internal/service/user"
+	desc "github.com/satanaroom/auth/pkg/user_v1"
 )
 
 type Implementation struct {
-	desc.UnimplementedAuthV1Server
+	desc.UnimplementedUserV1Server
 
-	authService auth.Service
+	authService user.Service
 }
 
-func NewImplementation(authService auth.Service) *Implementation {
+func NewImplementation(authService user.Service) *Implementation {
 	return &Implementation{
 		authService: authService,
 	}

@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	authV1 "github.com/satanaroom/auth/internal/api/auth_v1"
+	authV1 "github.com/satanaroom/auth/internal/api/user_v1"
 	"github.com/satanaroom/auth/internal/client/pg"
 	"github.com/satanaroom/auth/internal/closer"
 	"github.com/satanaroom/auth/internal/config"
-	authRepository "github.com/satanaroom/auth/internal/repository/auth"
-	authService "github.com/satanaroom/auth/internal/service/auth"
+	authRepository "github.com/satanaroom/auth/internal/repository/user"
+	authService "github.com/satanaroom/auth/internal/service/user"
 	"github.com/satanaroom/auth/pkg/logger"
 )
 

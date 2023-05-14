@@ -1,4 +1,4 @@
-package auth_v1
+package user_v1
 
 import (
 	"context"
@@ -6,10 +6,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	converter "github.com/satanaroom/auth/internal/converter/auth"
+	converter "github.com/satanaroom/auth/internal/converter/user"
 	"github.com/satanaroom/auth/internal/errs"
 	"github.com/satanaroom/auth/internal/model"
-	desc "github.com/satanaroom/auth/pkg/auth_v1"
+	desc "github.com/satanaroom/auth/pkg/user_v1"
 )
 
 func (i *Implementation) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {

@@ -1,10 +1,10 @@
-package auth
+package user
 
 import (
 	"context"
 
 	"github.com/satanaroom/auth/internal/model"
-	"github.com/satanaroom/auth/internal/repository/auth"
+	"github.com/satanaroom/auth/internal/repository/user"
 )
 
 var _ Service = (*service)(nil)
@@ -17,10 +17,10 @@ type Service interface {
 }
 
 type service struct {
-	authRepository auth.Repository
+	authRepository user.Repository
 }
 
-func NewService(authRepository auth.Repository) *service {
+func NewService(authRepository user.Repository) *service {
 	return &service{
 		authRepository: authRepository,
 	}
