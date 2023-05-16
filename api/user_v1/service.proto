@@ -33,9 +33,24 @@ service UserV1 {
       body: "*"
     };
   };
-  rpc Get(GetRequest) returns (GetResponse);
-  rpc Update(UpdateRequest) returns (UpdateResponse);
-  rpc Delete(DeleteRequest) returns (DeleteResponse);
+  rpc Get(GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+      post: "/user/v1/get"
+      body: "*"
+    };
+  };
+  rpc Update(UpdateRequest) returns (UpdateResponse) {
+    option (google.api.http) = {
+      post: "/user/v1/update"
+      body: "*"
+    };
+  };
+  rpc Delete(DeleteRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      post: "/user/v1/delete"
+      body: "*"
+    };
+  };
 }
 
 enum Role {
@@ -45,22 +60,15 @@ enum Role {
 }
 
 message UserInfo {
-  string username = 1 [(validate.rules).string = {min_len: 5, max_len: 50}];;
-  string email = 2;
-  string password = 3;
-  Role role = 4;
-}
-
-message UpdateUser {
-  google.protobuf.StringValue username = 1;
-  google.protobuf.StringValue email = 2;
-  google.protobuf.StringValue password = 3;
-  google.protobuf.Int32Value role = 4;
+  string username = 1 [(validate.rules).string = {min_len: 5, max_len: 50}];
+  string email = 2 [(validate.rules).string.email = true];
+  string password = 3 [(validate.rules).string = {min_len: 5, max_len: 50}];
+  Role role = 4 [(validate.rules).enum.defined_only = true];
 }
 
 message CreateRequest {
   UserInfo info = 1;
-  string password_confirm = 2;
+  string password_confirm = 2 [(validate.rules).string = {min_len: 5, max_len: 50}];
 }
 
 message CreateResponse {
@@ -68,7 +76,7 @@ message CreateResponse {
 }
 
 message GetRequest {
-  string username = 1;
+  string username = 1 [(validate.rules).string = {min_len: 5, max_len: 50}];
 }
 
 message GetResponse {
@@ -77,8 +85,15 @@ message GetResponse {
   google.protobuf.Timestamp updated_at = 3;
 }
 
+message UpdateUser {
+  google.protobuf.StringValue username = 1 [(validate.rules).string = {min_len: 5, max_len: 50}];
+  google.protobuf.StringValue email = 2 [(validate.rules).string.email = true];
+  google.protobuf.StringValue password = 3 [(validate.rules).string = {min_len: 5, max_len: 50}];
+  google.protobuf.Int32Value role = 4 [(validate.rules).int32 = {gte:0, lt: 3}];
+}
+
 message UpdateRequest {
-  string username = 1;
+  string username = 1 [(validate.rules).string = {min_len: 5, max_len: 50}];
   UpdateUser info = 2;
 }
 
@@ -87,7 +102,7 @@ message UpdateResponse {
 }
 
 message DeleteRequest {
-  string username = 1;
+  string username = 1 [(validate.rules).string = {min_len: 5, max_len: 50}];
 }
 
 message DeleteResponse {
