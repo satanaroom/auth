@@ -19,5 +19,10 @@ func (i *Implementation) Get(ctx context.Context, req *desc.GetRequest) (*desc.G
 		return nil, status.Errorf(codes.Internal, "failed to get user: %s", err.Error())
 	}
 
-	return converter.ToGetDesc(user), nil
+	resp, err := converter.ToGetDesc(user)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "converting: %s", err.Error())
+	}
+
+	return resp, nil
 }

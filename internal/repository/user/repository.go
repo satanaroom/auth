@@ -22,7 +22,7 @@ const tableName = "users"
 type Repository interface {
 	Create(ctx context.Context, info *model.UserInfo) (int64, error)
 	Get(ctx context.Context, username string) (*model.UserService, error)
-	Update(ctx context.Context, username string, user *model.UpdateUser) (int64, error)
+	Update(ctx context.Context, username string, user *model.UserRepo) (int64, error)
 	Delete(ctx context.Context, username string) (int64, error)
 }
 
@@ -41,8 +41,10 @@ func (r *repository) Create(ctx context.Context, info *model.UserInfo) (int64, e
 
 	builder := sq.Insert(tableName).
 		PlaceholderFormat(sq.Dollar).
-		Columns("username", "email", "password", "role", "created_at", "updated_at").
-		Values(info.User.Username, info.User.Email, info.User.Password, info.User.Role, t, t).
+		Columns("username", "email", "password", "role",
+			"created_at", "updated_at", "department", "department_type").
+		Values(info.User.Username, info.User.Email, info.User.Password,
+			info.User.Role, t, t, info.User.Department, info.User.DepartmentType).
 		Suffix("RETURNING id")
 
 	query, v, err := builder.ToSql()
@@ -64,7 +66,8 @@ func (r *repository) Create(ctx context.Context, info *model.UserInfo) (int64, e
 }
 
 func (r *repository) Get(ctx context.Context, username string) (*model.UserService, error) {
-	builder := sq.Select("username", "email", "password", "role", "created_at", "updated_at").
+	builder := sq.Select("username", "email", "password",
+		"role", "created_at", "updated_at", "department", "department_type").
 		PlaceholderFormat(sq.Dollar).
 		From(tableName).
 		Where(sq.Eq{
@@ -82,7 +85,7 @@ func (r *repository) Get(ctx context.Context, username string) (*model.UserServi
 		QueryRaw: query,
 	}
 
-	var user model.UserRepo
+	var user model.GetUser
 	if err = r.pgClient.PG().ScanOne(ctx, &user, q, v...); err != nil {
 		return nil, fmt.Errorf("scan one: %w", err)
 	}
@@ -118,7 +121,7 @@ func (r *repository) Delete(ctx context.Context, username string) (int64, error)
 	return res.RowsAffected(), nil
 }
 
-func (r *repository) Update(ctx context.Context, username string, user *model.UpdateUser) (int64, error) {
+func (r *repository) Update(ctx context.Context, username string, user *model.UserRepo) (int64, error) {
 	t := time.Now().UTC()
 
 	updateBuilder := sq.Update("users").
@@ -135,6 +138,10 @@ func (r *repository) Update(ctx context.Context, username string, user *model.Up
 	}
 	if user.Role.Valid {
 		updateBuilder = updateBuilder.Set("role", user.Role)
+	}
+	if user.DepartmentType.Valid {
+		updateBuilder = updateBuilder.Set("department", user.Department)
+		updateBuilder = updateBuilder.Set("department_type", user.DepartmentType.Int32)
 	}
 	updateBuilder = updateBuilder.Set("updated_at", t).
 		Where(sq.Eq{

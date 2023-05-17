@@ -35,6 +35,259 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on Development with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Development) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Development with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in DevelopmentMultiError, or
+// nil if none found.
+func (m *Development) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Development) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if val := m.GetGrade(); val < 0 || val >= 21 {
+		err := DevelopmentValidationError{
+			field:  "Grade",
+			reason: "value must be inside range [0, 21)",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if l := utf8.RuneCountInString(m.GetLanguage()); l < 2 || l > 20 {
+		err := DevelopmentValidationError{
+			field:  "Language",
+			reason: "value length must be between 2 and 20 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := Rate_name[int32(m.GetRate())]; !ok {
+		err := DevelopmentValidationError{
+			field:  "Rate",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return DevelopmentMultiError(errors)
+	}
+
+	return nil
+}
+
+// DevelopmentMultiError is an error wrapping multiple validation errors
+// returned by Development.ValidateAll() if the designated constraints aren't met.
+type DevelopmentMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DevelopmentMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DevelopmentMultiError) AllErrors() []error { return m }
+
+// DevelopmentValidationError is the validation error returned by
+// Development.Validate if the designated constraints aren't met.
+type DevelopmentValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DevelopmentValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DevelopmentValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DevelopmentValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DevelopmentValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DevelopmentValidationError) ErrorName() string { return "DevelopmentValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DevelopmentValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDevelopment.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DevelopmentValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DevelopmentValidationError{}
+
+// Validate checks the field values on Analytics with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Analytics) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Analytics with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AnalyticsMultiError, or nil
+// if none found.
+func (m *Analytics) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Analytics) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if l := utf8.RuneCountInString(m.GetSpecialization()); l < 5 || l > 50 {
+		err := AnalyticsValidationError{
+			field:  "Specialization",
+			reason: "value length must be between 5 and 50 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := Rate_name[int32(m.GetRate())]; !ok {
+		err := AnalyticsValidationError{
+			field:  "Rate",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return AnalyticsMultiError(errors)
+	}
+
+	return nil
+}
+
+// AnalyticsMultiError is an error wrapping multiple validation errors returned
+// by Analytics.ValidateAll() if the designated constraints aren't met.
+type AnalyticsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AnalyticsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AnalyticsMultiError) AllErrors() []error { return m }
+
+// AnalyticsValidationError is the validation error returned by
+// Analytics.Validate if the designated constraints aren't met.
+type AnalyticsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AnalyticsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AnalyticsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AnalyticsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AnalyticsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AnalyticsValidationError) ErrorName() string { return "AnalyticsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AnalyticsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAnalytics.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AnalyticsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AnalyticsValidationError{}
+
 // Validate checks the field values on UserInfo with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -100,6 +353,93 @@ func (m *UserInfo) validate(all bool) error {
 			return err
 		}
 		errors = append(errors, err)
+	}
+
+	switch v := m.Department.(type) {
+	case *UserInfo_Development:
+		if v == nil {
+			err := UserInfoValidationError{
+				field:  "Department",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetDevelopment()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UserInfoValidationError{
+						field:  "Development",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UserInfoValidationError{
+						field:  "Development",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetDevelopment()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UserInfoValidationError{
+					field:  "Development",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *UserInfo_Analytics:
+		if v == nil {
+			err := UserInfoValidationError{
+				field:  "Department",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAnalytics()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UserInfoValidationError{
+						field:  "Analytics",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UserInfoValidationError{
+						field:  "Analytics",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAnalytics()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UserInfoValidationError{
+					field:  "Analytics",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
@@ -848,6 +1188,93 @@ func (m *UpdateUser) validate(all bool) error {
 			errors = append(errors, err)
 		}
 
+	}
+
+	switch v := m.Department.(type) {
+	case *UpdateUser_Development:
+		if v == nil {
+			err := UpdateUserValidationError{
+				field:  "Department",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetDevelopment()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UpdateUserValidationError{
+						field:  "Development",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UpdateUserValidationError{
+						field:  "Development",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetDevelopment()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UpdateUserValidationError{
+					field:  "Development",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *UpdateUser_Analytics:
+		if v == nil {
+			err := UpdateUserValidationError{
+				field:  "Department",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetAnalytics()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UpdateUserValidationError{
+						field:  "Analytics",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UpdateUserValidationError{
+						field:  "Analytics",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAnalytics()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UpdateUserValidationError{
+					field:  "Analytics",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {

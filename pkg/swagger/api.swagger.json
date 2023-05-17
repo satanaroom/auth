@@ -183,6 +183,17 @@
         }
       }
     },
+    "user_v1Analytics": {
+      "type": "object",
+      "properties": {
+        "specialization": {
+          "type": "string"
+        },
+        "rate": {
+          "$ref": "#/definitions/user_v1Rate"
+        }
+      }
+    },
     "user_v1CreateRequest": {
       "type": "object",
       "properties": {
@@ -220,6 +231,21 @@
         }
       }
     },
+    "user_v1Development": {
+      "type": "object",
+      "properties": {
+        "grade": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "language": {
+          "type": "string"
+        },
+        "rate": {
+          "$ref": "#/definitions/user_v1Rate"
+        }
+      }
+    },
     "user_v1GetRequest": {
       "type": "object",
       "properties": {
@@ -243,6 +269,15 @@
           "format": "date-time"
         }
       }
+    },
+    "user_v1Rate": {
+      "type": "string",
+      "enum": [
+        "RATE_UNKNOWN",
+        "RATE_HALF",
+        "RATE_FULL"
+      ],
+      "default": "RATE_UNKNOWN"
     },
     "user_v1Role": {
       "type": "string",
@@ -288,6 +323,12 @@
         "role": {
           "type": "integer",
           "format": "int32"
+        },
+        "development": {
+          "$ref": "#/definitions/user_v1Development"
+        },
+        "analytics": {
+          "$ref": "#/definitions/user_v1Analytics"
         }
       }
     },
@@ -305,6 +346,12 @@
         },
         "role": {
           "$ref": "#/definitions/user_v1Role"
+        },
+        "development": {
+          "$ref": "#/definitions/user_v1Development"
+        },
+        "analytics": {
+          "$ref": "#/definitions/user_v1Analytics"
         }
       }
     }

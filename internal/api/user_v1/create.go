@@ -16,8 +16,11 @@ func (i *Implementation) Create(ctx context.Context, req *desc.CreateRequest) (*
 	if err := validateCreateRequest(req.GetInfo(), req.GetPasswordConfirm()); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "validate request: %s", err.Error())
 	}
-
-	id, err := i.authService.Create(ctx, converter.ToInfo(req.GetInfo(), req.GetPasswordConfirm()))
+	info, err := converter.ToInfo(req.GetInfo(), req.GetPasswordConfirm())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "converting: %s", err.Error())
+	}
+	id, err := i.authService.Create(ctx, info)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create user: %s", err.Error())
 	}
