@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package user_v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "validate/validate.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/satanaroom/auth;user_v1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "User API"
+    version: "1.0.0"
+    contact: {
+      name: "Yan Karpov"
+      email: "ftragula@mail.ru"
+    };
+  };
+
+  host: "localhost:8080"
+  schemes: HTTP
+  schemes: HTTPS
+  consumes: "application/json"
+};
+
+service UserV1 {
+  rpc Create(CreateRequest) returns (CreateResponse) {
+    option (google.api.http) = {
+      post: "/user/v1/create"
+      body: "*"
+    };
+  };
+  rpc Get(GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+      post: "/user/v1/get"
+      body: "*"
+    };
+  };
+  rpc Update(UpdateRequest) returns (UpdateResponse) {
+    option (google.api.http) = {
+      post: "/user/v1/update"
+      body: "*"
+    };
+  };
+  rpc Delete(DeleteRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      post: "/user/v1/delete"
+      body: "*"
+    };
+  };
+}
+
+enum Role {
+  ROLE_UNKNOWN = 0;
+  ROLE_ADMIN = 1;
+  ROLE_USER = 2;
+}
+
+enum Rate {
+  RATE_UNKNOWN = 0;
+  RATE_HALF = 1;
+  RATE_FULL = 2;
+}
+
+message Development {
+  int32 grade = 1 [(validate.rules).int32 = {gte:0, lt: 21}];
+  string language = 2 [(validate.rules).string = {min_len: 2, max_len: 20}];
+  Rate rate = 3 [(validate.rules).enum.defined_only = true];
+}
+
+message Analytics {
+  string specialization = 1 [(validate.rules).string = {min_len: 5, max_len: 50}];
+  Rate rate = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserInfo {
+  string username = 1 [(validate.rules).string = {min_len: 5, max_len: 50}];
+  string email = 2 [(validate.rules).string.email = true];
+  string password = 3 [(validate.rules).string = {min_len: 5, max_len: 50}];
+  Role role = 4 [(validate.rules).enum.defined_only = true];
+  oneof department {
+    Development development = 5;
+    Analytics analytics = 6;
+  }
+}
+
+message CreateRequest {
+  UserInfo info = 1;
+  string password_confirm = 2 [(validate.rules).string = {min_len: 5, max_len: 50}];
+}
+
+message CreateResponse {
+  int64 id = 1;
+}
+
+message GetRequest {
+  string username = 1 [(validate.rules).string = {min_len: 5, max_len: 50}];
+}
+
+message GetResponse {
+  UserInfo info = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+message UpdateUser {
+  google.protobuf.StringValue username = 1 [(validate.rules).string = {max_len: 50}];
+  google.protobuf.StringValue email = 2;
+  google.protobuf.StringValue password = 3 [(validate.rules).string = {max_len: 50}];
+  google.protobuf.Int32Value role = 4;
+  oneof department {
+    Development development = 5;
+    Analytics analytics = 6;
+  }
+}
+
+message UpdateRequest {
+  string username = 1 [(validate.rules).string = {min_len: 5, max_len: 50}];
+  UpdateUser info = 2;
+}
+
+message UpdateResponse {
+  int64 id = 1;
+}
+
+message DeleteRequest {
+  string username = 1 [(validate.rules).string = {min_len: 5, max_len: 50}];
+}
+
+message DeleteResponse {
+  int64 affected_rows = 1;
+}
+

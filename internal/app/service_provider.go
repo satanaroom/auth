@@ -4,18 +4,20 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	authV1 "github.com/satanaroom/auth/internal/api/auth_v1"
+	authV1 "github.com/satanaroom/auth/internal/api/user_v1"
 	"github.com/satanaroom/auth/internal/client/pg"
 	"github.com/satanaroom/auth/internal/closer"
 	"github.com/satanaroom/auth/internal/config"
-	authRepository "github.com/satanaroom/auth/internal/repository/auth"
-	authService "github.com/satanaroom/auth/internal/service/auth"
+	authRepository "github.com/satanaroom/auth/internal/repository/user"
+	authService "github.com/satanaroom/auth/internal/service/user"
 	"github.com/satanaroom/auth/pkg/logger"
 )
 
 type serviceProvider struct {
-	pgConfig   config.PGConfig
-	grpcConfig config.GRPCConfig
+	pgConfig      config.PGConfig
+	grpcConfig    config.GRPCConfig
+	httpConfig    config.HTTPConfig
+	swaggerConfig config.SwaggerConfig
 
 	pgClient       pg.Client
 	authRepository authRepository.Repository
@@ -52,6 +54,32 @@ func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
 	}
 
 	return s.grpcConfig
+}
+
+func (s *serviceProvider) HTTPConfig() config.HTTPConfig {
+	if s.httpConfig == nil {
+		cfg, err := config.NewHTTPConfig()
+		if err != nil {
+			logger.Fatalf("failed to get http config: %s", err.Error())
+		}
+
+		s.httpConfig = cfg
+	}
+
+	return s.httpConfig
+}
+
+func (s *serviceProvider) SwaggerConfig() config.SwaggerConfig {
+	if s.swaggerConfig == nil {
+		cfg, err := config.NewSwaggerConfig()
+		if err != nil {
+			logger.Fatalf("failed to get swagger config: %s", err.Error())
+		}
+
+		s.swaggerConfig = cfg
+	}
+
+	return s.swaggerConfig
 }
 
 func (s *serviceProvider) PGClient(ctx context.Context) pg.Client {

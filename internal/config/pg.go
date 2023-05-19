@@ -1,9 +1,7 @@
 package config
 
 import (
-	"os"
-
-	"github.com/satanaroom/auth/internal/errs"
+	"github.com/satanaroom/auth/pkg/env"
 )
 
 var _ PGConfig = (*pgConfig)(nil)
@@ -19,10 +17,8 @@ type pgConfig struct {
 }
 
 func NewPGConfig() (*pgConfig, error) {
-	dsn := os.Getenv(pgDSNEnvName)
-	if len(dsn) == 0 {
-		return nil, errs.ErrDSNNotFound
-	}
+	var dsn string
+	env.ToString(&dsn, pgDSNEnvName, "")
 
 	return &pgConfig{
 		dsn: dsn,

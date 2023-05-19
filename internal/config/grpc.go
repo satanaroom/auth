@@ -1,34 +1,30 @@
 package config
 
 import (
-	"os"
-
-	"github.com/satanaroom/auth/internal/errs"
+	"github.com/satanaroom/auth/pkg/env"
 )
 
 var _ GRPCConfig = (*grpcConfig)(nil)
 
-const grpcPortEnvName = "GRPC_PORT"
+const grpcHostEnvName = "GRPC_HOST"
 
 type GRPCConfig interface {
-	Port() string
+	Host() string
 }
 
 type grpcConfig struct {
-	port string
+	host string
 }
 
 func NewGRPCConfig() (*grpcConfig, error) {
-	port := os.Getenv(grpcPortEnvName)
-	if port == "" {
-		return nil, errs.ErrGRPCPortNotFound
-	}
+	var host string
+	env.ToString(&host, grpcHostEnvName, "localhost:50051")
 
 	return &grpcConfig{
-		port: port,
+		host: host,
 	}, nil
 }
 
-func (c *grpcConfig) Port() string {
-	return c.port
+func (c *grpcConfig) Host() string {
+	return c.host
 }

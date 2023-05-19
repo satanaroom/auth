@@ -1,0 +1,359 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "User API",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Yan Karpov",
+      "email": "ftragula@mail.ru"
+    }
+  },
+  "tags": [
+    {
+      "name": "UserV1"
+    }
+  ],
+  "host": "localhost:8080",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/user/v1/create": {
+      "post": {
+        "operationId": "UserV1_Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_v1CreateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user_v1CreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserV1"
+        ]
+      }
+    },
+    "/user/v1/delete": {
+      "post": {
+        "operationId": "UserV1_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_v1DeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user_v1DeleteRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserV1"
+        ]
+      }
+    },
+    "/user/v1/get": {
+      "post": {
+        "operationId": "UserV1_Get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_v1GetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user_v1GetRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserV1"
+        ]
+      }
+    },
+    "/user/v1/update": {
+      "post": {
+        "operationId": "UserV1_Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_v1UpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user_v1UpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserV1"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "user_v1Analytics": {
+      "type": "object",
+      "properties": {
+        "specialization": {
+          "type": "string"
+        },
+        "rate": {
+          "$ref": "#/definitions/user_v1Rate"
+        }
+      }
+    },
+    "user_v1CreateRequest": {
+      "type": "object",
+      "properties": {
+        "info": {
+          "$ref": "#/definitions/user_v1UserInfo"
+        },
+        "passwordConfirm": {
+          "type": "string"
+        }
+      }
+    },
+    "user_v1CreateResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "user_v1DeleteRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "user_v1DeleteResponse": {
+      "type": "object",
+      "properties": {
+        "affectedRows": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "user_v1Development": {
+      "type": "object",
+      "properties": {
+        "grade": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "language": {
+          "type": "string"
+        },
+        "rate": {
+          "$ref": "#/definitions/user_v1Rate"
+        }
+      }
+    },
+    "user_v1GetRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "user_v1GetResponse": {
+      "type": "object",
+      "properties": {
+        "info": {
+          "$ref": "#/definitions/user_v1UserInfo"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "user_v1Rate": {
+      "type": "string",
+      "enum": [
+        "RATE_UNKNOWN",
+        "RATE_HALF",
+        "RATE_FULL"
+      ],
+      "default": "RATE_UNKNOWN"
+    },
+    "user_v1Role": {
+      "type": "string",
+      "enum": [
+        "ROLE_UNKNOWN",
+        "ROLE_ADMIN",
+        "ROLE_USER"
+      ],
+      "default": "ROLE_UNKNOWN"
+    },
+    "user_v1UpdateRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "info": {
+          "$ref": "#/definitions/user_v1UpdateUser"
+        }
+      }
+    },
+    "user_v1UpdateResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "user_v1UpdateUser": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "role": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "development": {
+          "$ref": "#/definitions/user_v1Development"
+        },
+        "analytics": {
+          "$ref": "#/definitions/user_v1Analytics"
+        }
+      }
+    },
+    "user_v1UserInfo": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/definitions/user_v1Role"
+        },
+        "development": {
+          "$ref": "#/definitions/user_v1Development"
+        },
+        "analytics": {
+          "$ref": "#/definitions/user_v1Analytics"
+        }
+      }
+    }
+  }
+}
