@@ -3,15 +3,15 @@ package user
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/satanaroom/auth/internal/model"
+	"github.com/satanaroom/auth/pkg/logger"
 	desc "github.com/satanaroom/auth/pkg/user_v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func ToInfo(info *desc.UserInfo, passwordConfirm string) (*model.UserInfo, error) {
+func ToInfo(info *desc.UserInfo, passwordConfirm string) *model.UserInfo {
 	var (
 		deptType model.Dept
 		deptData []byte
@@ -26,7 +26,8 @@ func ToInfo(info *desc.UserInfo, passwordConfirm string) (*model.UserInfo, error
 			Rate:     model.Rate(info.GetDevelopment().GetRate()),
 		})
 		if err != nil {
-			return nil, fmt.Errorf("marshal development: %w", err)
+			logger.Errorf("marshal: %s", err.Error())
+			return nil
 		}
 	case *desc.UserInfo_Analytics:
 		deptType = model.AnalyticsDept
@@ -35,7 +36,8 @@ func ToInfo(info *desc.UserInfo, passwordConfirm string) (*model.UserInfo, error
 			Rate:           model.Rate(info.GetAnalytics().GetRate()),
 		})
 		if err != nil {
-			return nil, fmt.Errorf("marshal analytics: %w", err)
+			logger.Errorf("marshal: %s", err.Error())
+			return nil
 		}
 	}
 
@@ -49,13 +51,13 @@ func ToInfo(info *desc.UserInfo, passwordConfirm string) (*model.UserInfo, error
 			DepartmentType: deptType,
 		},
 		PasswordConfirm: passwordConfirm,
-	}, nil
+	}
 }
 func ToUsername(username string) model.Username {
 	return model.Username(username)
 }
 
-func ToUpdateUser(info *desc.UpdateUser) (*model.UserRepo, error) {
+func ToUpdateUser(info *desc.UpdateUser) *model.UserRepo {
 	var usernameValid, emailValid, passwordValid, roleValid, departmentValid bool
 	if info.Username.ProtoReflect().IsValid() {
 		usernameValid = true
@@ -84,7 +86,8 @@ func ToUpdateUser(info *desc.UpdateUser) (*model.UserRepo, error) {
 			Rate:     model.Rate(info.GetDevelopment().GetRate()),
 		})
 		if err != nil {
-			return nil, fmt.Errorf("marshal development: %w", err)
+			logger.Errorf("marshal: %s", err.Error())
+			return nil
 		}
 	case *desc.UpdateUser_Analytics:
 		deptType = model.AnalyticsDept
@@ -93,7 +96,8 @@ func ToUpdateUser(info *desc.UpdateUser) (*model.UserRepo, error) {
 			Rate:           model.Rate(info.GetAnalytics().GetRate()),
 		})
 		if err != nil {
-			return nil, fmt.Errorf("marshal analytics: %w", err)
+			logger.Errorf("marshal: %s", err.Error())
+			return nil
 		}
 	}
 
@@ -123,7 +127,7 @@ func ToUpdateUser(info *desc.UpdateUser) (*model.UserRepo, error) {
 			Int32: int32(deptType),
 			Valid: departmentValid,
 		},
-	}, nil
+	}
 }
 
 func ToGetService(user *model.GetUser) *model.UserService {
@@ -170,7 +174,7 @@ func ToGetService(user *model.GetUser) *model.UserService {
 	}
 }
 
-func ToGetDesc(user *model.UserService) (*desc.GetResponse, error) {
+func ToGetDesc(user *model.UserService) *desc.GetResponse {
 	resp := &desc.GetResponse{
 		Info: &desc.UserInfo{
 			Username: user.User.Username,
@@ -185,7 +189,8 @@ func ToGetDesc(user *model.UserService) (*desc.GetResponse, error) {
 	case model.DevelopmentDept:
 		var dev model.Development
 		if err := json.Unmarshal(user.User.Department, &dev); err != nil {
-			return nil, fmt.Errorf("unmarshal development: %w", err)
+			logger.Errorf("marshal: %s", err.Error())
+			return nil
 		}
 		resp.Info.Department = &desc.UserInfo_Development{
 			Development: &desc.Development{
@@ -197,7 +202,8 @@ func ToGetDesc(user *model.UserService) (*desc.GetResponse, error) {
 	case model.AnalyticsDept:
 		var analytics model.Analytics
 		if err := json.Unmarshal(user.User.Department, &analytics); err != nil {
-			return nil, fmt.Errorf("unmarshal analytics: %w", err)
+			logger.Errorf("marshal: %s", err.Error())
+			return nil
 		}
 		resp.Info.Department = &desc.UserInfo_Analytics{
 			Analytics: &desc.Analytics{
@@ -206,5 +212,5 @@ func ToGetDesc(user *model.UserService) (*desc.GetResponse, error) {
 			},
 		}
 	}
-	return resp, nil
+	return resp
 }

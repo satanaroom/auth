@@ -1,34 +1,30 @@
 package config
 
 import (
-	"os"
-
-	"github.com/satanaroom/auth/internal/errs"
+	"github.com/satanaroom/auth/pkg/env"
 )
 
 var _ HTTPConfig = (*httpConfig)(nil)
 
-const httpPortEnvName = "HTTP_PORT"
+const httpHostEnvName = "HTTP_HOST"
 
 type HTTPConfig interface {
-	Port() string
+	Host() string
 }
 
 type httpConfig struct {
-	port string
+	host string
 }
 
 func NewHTTPConfig() (*httpConfig, error) {
-	port := os.Getenv(httpPortEnvName)
-	if port == "" {
-		return nil, errs.ErrHTTPPortNotFound
-	}
+	var host string
+	env.ToString(&host, httpHostEnvName, "localhost:8080")
 
 	return &httpConfig{
-		port: port,
+		host: host,
 	}, nil
 }
 
-func (c *httpConfig) Port() string {
-	return c.port
+func (c *httpConfig) Host() string {
+	return c.host
 }

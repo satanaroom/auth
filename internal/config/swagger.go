@@ -1,34 +1,30 @@
 package config
 
 import (
-	"os"
-
-	"github.com/satanaroom/auth/internal/errs"
+	"github.com/satanaroom/auth/pkg/env"
 )
 
 var _ SwaggerConfig = (*swaggerConfig)(nil)
 
-const swaggerPortEnvName = "SWAGGER_PORT"
+const swaggerHostEnvName = "SWAGGER_HOST"
 
 type SwaggerConfig interface {
-	Port() string
+	Host() string
 }
 
 type swaggerConfig struct {
-	port string
+	host string
 }
 
 func NewSwaggerConfig() (*swaggerConfig, error) {
-	port := os.Getenv(swaggerPortEnvName)
-	if port == "" {
-		return nil, errs.ErrSwaggerPortNotFound
-	}
+	var host string
+	env.ToString(&host, swaggerHostEnvName, "localhost:8090")
 
 	return &swaggerConfig{
-		port: port,
+		host: host,
 	}, nil
 }
 
-func (c *swaggerConfig) Port() string {
-	return c.port
+func (c *swaggerConfig) Host() string {
+	return c.host
 }

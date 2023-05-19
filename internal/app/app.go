@@ -100,7 +100,6 @@ func (a *App) initServiceProvider(_ context.Context) error {
 func (a *App) initGRPCServer(ctx context.Context) error {
 	a.grpcServer = grpc.NewServer(
 		grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
-		//grpc.UnaryInterceptor(grpcValidator.UnaryServerInterceptor()),
 	)
 
 	reflection.Register(a.grpcServer)
@@ -117,7 +116,7 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
-	if err := desc.RegisterUserV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Port(), opts); err != nil {
+	if err := desc.RegisterUserV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Host(), opts); err != nil {
 		return fmt.Errorf("register user v1 handler from endpoint: %w", err)
 	}
 
@@ -129,7 +128,7 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 	})
 
 	a.httpServer = &http.Server{
-		Addr:    a.serviceProvider.HTTPConfig().Port(),
+		Addr:    a.serviceProvider.HTTPConfig().Host(),
 		Handler: corsMiddleware.Handler(mux),
 	}
 
@@ -147,7 +146,7 @@ func (a *App) initSwaggerServer(_ context.Context) error {
 	mux.HandleFunc("/api.swagger.json/", serveSwaggerFile("/api.swagger.json"))
 
 	a.swagger = &http.Server{
-		Addr:    a.serviceProvider.SwaggerConfig().Port(),
+		Addr:    a.serviceProvider.SwaggerConfig().Host(),
 		Handler: mux,
 	}
 
@@ -155,9 +154,9 @@ func (a *App) initSwaggerServer(_ context.Context) error {
 }
 
 func (a *App) runGRPCServer() error {
-	logger.Infof("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Port())
+	logger.Infof("GRPC server is running on %s", a.serviceProvider.GRPCConfig().Host())
 
-	list, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().Port())
+	list, err := net.Listen("tcp", a.serviceProvider.GRPCConfig().Host())
 	if err != nil {
 		return fmt.Errorf("failed to get listener: %s", err.Error())
 	}
@@ -170,7 +169,7 @@ func (a *App) runGRPCServer() error {
 }
 
 func (a *App) runHTTPServer() error {
-	logger.Infof("HTTP server is running on %s", a.serviceProvider.HTTPConfig().Port())
+	logger.Infof("HTTP server is running on %s", a.serviceProvider.HTTPConfig().Host())
 
 	if err := a.httpServer.ListenAndServe(); err != nil {
 		return fmt.Errorf("failed to serve: %s", err.Error())
@@ -180,7 +179,7 @@ func (a *App) runHTTPServer() error {
 }
 
 func (a *App) runSwaggerServer() error {
-	logger.Infof("Swagger server is running on %s", a.serviceProvider.SwaggerConfig().Port())
+	logger.Infof("Swagger server is running on %s", a.serviceProvider.SwaggerConfig().Host())
 
 	if err := a.swagger.ListenAndServe(); err != nil {
 		return fmt.Errorf("failed to serve: %s", err.Error())
