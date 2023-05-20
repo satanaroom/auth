@@ -17,7 +17,6 @@ func (s *service) GetRefreshToken(ctx context.Context, username, password string
 		return "", fmt.Errorf("password is invalid")
 	}
 
-	// TODO: config
 	token, err := utils.GenerateToken(&user.User, s.config.RefreshTokenSecretKey(), s.config.RefreshTokenExpiration())
 	if err != nil {
 		return "", fmt.Errorf("utils.GenerateToken: %w", err)

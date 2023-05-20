@@ -14,6 +14,7 @@ import (
 	"github.com/satanaroom/auth/internal/closer"
 	"github.com/satanaroom/auth/internal/config"
 	"github.com/satanaroom/auth/internal/interceptor"
+	descAccessV1 "github.com/satanaroom/auth/pkg/access_v1"
 	authUserV1 "github.com/satanaroom/auth/pkg/auth_v1"
 	"github.com/satanaroom/auth/pkg/logger"
 	descUserV1 "github.com/satanaroom/auth/pkg/user_v1"
@@ -108,6 +109,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 
 	descUserV1.RegisterUserV1Server(a.grpcServer, a.serviceProvider.UserImpl(ctx))
 	authUserV1.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.AuthImpl(ctx))
+	descAccessV1.RegisterAccessV1Server(a.grpcServer, a.serviceProvider.AccessImpl(ctx))
 
 	return nil
 }

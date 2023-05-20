@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "auth.proto",
+    "title": "access.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "AuthV1"
+      "name": "AccessV1"
     }
   ],
   "consumes": [
@@ -17,19 +17,11 @@
   ],
   "paths": {},
   "definitions": {
-    "auth_v1GetAccessTokenResponse": {
+    "access_v1CheckResponse": {
       "type": "object",
       "properties": {
-        "accessToken": {
-          "type": "string"
-        }
-      }
-    },
-    "auth_v1GetRefreshTokenResponse": {
-      "type": "object",
-      "properties": {
-        "refreshToken": {
-          "type": "string"
+        "isAllowed": {
+          "type": "boolean"
         }
       }
     },
