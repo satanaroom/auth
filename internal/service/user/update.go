@@ -15,7 +15,7 @@ func (s *service) Update(ctx context.Context, username string, user *model.UserR
 		return 0, fmt.Errorf("user repo: %w", errs.ErrUserConverting)
 	}
 
-	id, err := s.authRepository.Update(ctx, username, user)
+	id, err := s.userRepository.Update(ctx, username, user)
 	if err != nil {
 		logger.Errorf("authRepository.Update: %s", err.Error())
 		return 0, fmt.Errorf("authRepository.Update: %w", err)

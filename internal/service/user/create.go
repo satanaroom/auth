@@ -20,7 +20,7 @@ func (s *service) Create(ctx context.Context, info *model.UserInfo) (int64, erro
 		return 0, errs.ErrPasswordMismatch
 	}
 
-	id, err := s.authRepository.Create(ctx, info)
+	id, err := s.userRepository.Create(ctx, info)
 	if err != nil {
 		logger.Errorf("authRepository.Create: %s", err.Error())
 		return 0, fmt.Errorf("authRepository.Create: %w", err)

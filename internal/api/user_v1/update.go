@@ -11,7 +11,7 @@ import (
 )
 
 func (i *Implementation) Update(ctx context.Context, req *desc.UpdateRequest) (*desc.UpdateResponse, error) {
-	id, err := i.authService.Update(ctx, req.GetUsername(), converter.ToUpdateUser(req.GetInfo()))
+	id, err := i.userService.Update(ctx, req.GetUsername(), converter.ToUpdateUser(req.GetInfo()))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to update user: %s", err.Error())
 	}

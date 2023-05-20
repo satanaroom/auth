@@ -11,7 +11,7 @@ import (
 )
 
 func (i *Implementation) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
-	id, err := i.authService.Create(ctx, converter.ToInfo(req.GetInfo(), req.GetPasswordConfirm()))
+	id, err := i.userService.Create(ctx, converter.ToInfo(req.GetInfo(), req.GetPasswordConfirm()))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create user: %s", err.Error())
 	}
