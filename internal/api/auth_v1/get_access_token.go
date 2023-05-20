@@ -7,7 +7,7 @@ import (
 )
 
 func (i *Implementation) GetAccessToken(ctx context.Context, req *desc.GetAccessTokenRequest) (*desc.GetAccessTokenResponse, error) {
-	accessToken, err := i.authService.GetAccessToken()
+	accessToken, err := i.authService.GetAccessToken(ctx, req.GetRefreshToken())
 	if err != nil {
 		return nil, err
 	}

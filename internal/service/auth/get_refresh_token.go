@@ -1,8 +1,27 @@
 package auth
 
-import "context"
+import (
+	"context"
+	"fmt"
+
+	"github.com/satanaroom/auth/internal/utils"
+)
 
 func (s *service) GetRefreshToken(ctx context.Context, username, password string) (string, error) {
+	user, err := s.userRepository.Get(ctx, username)
+	if err != nil {
+		return "", fmt.Errorf("userRepository.Get: %w", err)
+	}
 
-	return "", nil
+	if !utils.HashPassword(user.User.Password, password) {
+		return "", fmt.Errorf("password is invalid")
+	}
+
+	// TODO: config
+	token, err := utils.GenerateToken(&user.User, s.config.RefreshTokenSecretKey(), s.config.RefreshTokenExpiration())
+	if err != nil {
+		return "", fmt.Errorf("utils.GenerateToken: %w", err)
+	}
+
+	return token, nil
 }
