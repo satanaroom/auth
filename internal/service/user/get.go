@@ -9,7 +9,7 @@ import (
 )
 
 func (s *service) Get(ctx context.Context, username model.Username) (*model.UserService, error) {
-	user, err := s.authRepository.Get(ctx, string(username))
+	user, err := s.userRepository.Get(ctx, string(username))
 	if err != nil {
 		logger.Errorf("authRepository.Get: %s", err.Error())
 		return nil, fmt.Errorf("authRepository.Get: %w", err)

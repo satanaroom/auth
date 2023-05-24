@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/satanaroom/auth/internal/model"
+	"github.com/satanaroom/auth/internal/utils"
 	"github.com/satanaroom/auth/pkg/logger"
 	desc "github.com/satanaroom/auth/pkg/user_v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -26,8 +27,7 @@ func ToInfo(info *desc.UserInfo, passwordConfirm string) *model.UserInfo {
 			Rate:     model.Rate(info.GetDevelopment().GetRate()),
 		})
 		if err != nil {
-			logger.Errorf("marshal: %s", err.Error())
-			return nil
+			logger.Fatalf("marshal: %s", err.Error())
 		}
 	case *desc.UserInfo_Analytics:
 		deptType = model.AnalyticsDept
@@ -36,8 +36,7 @@ func ToInfo(info *desc.UserInfo, passwordConfirm string) *model.UserInfo {
 			Rate:           model.Rate(info.GetAnalytics().GetRate()),
 		})
 		if err != nil {
-			logger.Errorf("marshal: %s", err.Error())
-			return nil
+			logger.Fatalf("marshal: %s", err.Error())
 		}
 	}
 
@@ -58,25 +57,20 @@ func ToUsername(username string) model.Username {
 }
 
 func ToUpdateUser(info *desc.UpdateUser) *model.UserRepo {
-	var usernameValid, emailValid, passwordValid, roleValid, departmentValid bool
-	if info.Username.ProtoReflect().IsValid() {
-		usernameValid = true
-	}
-	if info.Email.ProtoReflect().IsValid() {
-		emailValid = true
-	}
-	if info.Password.ProtoReflect().IsValid() {
-		passwordValid = true
-	}
-	if info.Role.ProtoReflect().IsValid() {
-		roleValid = true
-	}
-
 	var (
+		password string
+		err      error
 		deptType model.Dept
 		deptData []byte
-		err      error
 	)
+
+	if info.Password.ProtoReflect().IsValid() {
+		password, err = utils.GeneratePasswordHash(info.Password.GetValue())
+		if err != nil {
+			logger.Fatalf("generate password hash: %s", err.Error())
+		}
+	}
+
 	switch info.GetDepartment().(type) {
 	case *desc.UpdateUser_Development:
 		deptType = model.DevelopmentDept
@@ -86,8 +80,7 @@ func ToUpdateUser(info *desc.UpdateUser) *model.UserRepo {
 			Rate:     model.Rate(info.GetDevelopment().GetRate()),
 		})
 		if err != nil {
-			logger.Errorf("marshal: %s", err.Error())
-			return nil
+			logger.Fatalf("marshal: %s", err.Error())
 		}
 	case *desc.UpdateUser_Analytics:
 		deptType = model.AnalyticsDept
@@ -96,36 +89,33 @@ func ToUpdateUser(info *desc.UpdateUser) *model.UserRepo {
 			Rate:           model.Rate(info.GetAnalytics().GetRate()),
 		})
 		if err != nil {
-			logger.Errorf("marshal: %s", err.Error())
-			return nil
+			logger.Fatalf("marshal: %s", err.Error())
 		}
-	}
-
-	if deptType != 0 {
-		departmentValid = true
 	}
 
 	return &model.UserRepo{
 		Username: sql.NullString{
 			String: info.Username.GetValue(),
-			Valid:  usernameValid,
+			Valid:  info.Username.ProtoReflect().IsValid(),
 		},
 		Email: sql.NullString{
 			String: info.Email.GetValue(),
-			Valid:  emailValid,
+			Valid:  info.Email.ProtoReflect().IsValid(),
 		},
 		Password: sql.NullString{
-			String: info.Password.GetValue(),
-			Valid:  passwordValid,
+			String: password,
+			Valid:  info.Password.ProtoReflect().IsValid(),
 		},
 		Role: sql.NullInt32{
 			Int32: info.Role.GetValue(),
-			Valid: roleValid,
+			Valid: info.Role.ProtoReflect().IsValid(),
 		},
 		Department: deptData,
 		DepartmentType: sql.NullInt32{
 			Int32: int32(deptType),
-			Valid: departmentValid,
+			Valid: func(departmentType model.Dept) bool {
+				return deptType != 0
+			}(deptType),
 		},
 	}
 }
@@ -189,8 +179,7 @@ func ToGetDesc(user *model.UserService) *desc.GetResponse {
 	case model.DevelopmentDept:
 		var dev model.Development
 		if err := json.Unmarshal(user.User.Department, &dev); err != nil {
-			logger.Errorf("marshal: %s", err.Error())
-			return nil
+			logger.Fatalf("marshal: %s", err.Error())
 		}
 		resp.Info.Department = &desc.UserInfo_Development{
 			Development: &desc.Development{
@@ -202,8 +191,7 @@ func ToGetDesc(user *model.UserService) *desc.GetResponse {
 	case model.AnalyticsDept:
 		var analytics model.Analytics
 		if err := json.Unmarshal(user.User.Department, &analytics); err != nil {
-			logger.Errorf("marshal: %s", err.Error())
-			return nil
+			logger.Fatalf("marshal: %s", err.Error())
 		}
 		resp.Info.Department = &desc.UserInfo_Analytics{
 			Analytics: &desc.Analytics{

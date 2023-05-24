@@ -4,12 +4,19 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	authV1 "github.com/satanaroom/auth/internal/api/user_v1"
+	accessV1 "github.com/satanaroom/auth/internal/api/access_v1"
+	authV1 "github.com/satanaroom/auth/internal/api/auth_v1"
+	userV1 "github.com/satanaroom/auth/internal/api/user_v1"
+
 	"github.com/satanaroom/auth/internal/client/pg"
 	"github.com/satanaroom/auth/internal/closer"
 	"github.com/satanaroom/auth/internal/config"
-	authRepository "github.com/satanaroom/auth/internal/repository/user"
-	authService "github.com/satanaroom/auth/internal/service/user"
+	accessRepository "github.com/satanaroom/auth/internal/repository/access"
+	userRepository "github.com/satanaroom/auth/internal/repository/user"
+	accessService "github.com/satanaroom/auth/internal/service/access"
+	authService "github.com/satanaroom/auth/internal/service/auth"
+	userService "github.com/satanaroom/auth/internal/service/user"
+
 	"github.com/satanaroom/auth/pkg/logger"
 )
 
@@ -18,12 +25,19 @@ type serviceProvider struct {
 	grpcConfig    config.GRPCConfig
 	httpConfig    config.HTTPConfig
 	swaggerConfig config.SwaggerConfig
+	authConfig    config.AuthConfig
 
-	pgClient       pg.Client
-	authRepository authRepository.Repository
-	authService    authService.Service
+	pgClient         pg.Client
+	userRepository   userRepository.Repository
+	accessRepository accessRepository.Repository
 
-	authImpl *authV1.Implementation
+	userService   userService.Service
+	authService   authService.Service
+	accessService accessService.Service
+
+	userImpl   *userV1.Implementation
+	authImpl   *authV1.Implementation
+	accessImpl *accessV1.Implementation
 }
 
 func newServiceProvider() *serviceProvider {
@@ -82,6 +96,19 @@ func (s *serviceProvider) SwaggerConfig() config.SwaggerConfig {
 	return s.swaggerConfig
 }
 
+func (s *serviceProvider) AuthConfig() config.AuthConfig {
+	if s.authConfig == nil {
+		cfg, err := config.NewAuthConfig()
+		if err != nil {
+			logger.Fatalf("failed to get auth config: %s", err.Error())
+		}
+
+		s.authConfig = cfg
+	}
+
+	return s.authConfig
+}
+
 func (s *serviceProvider) PGClient(ctx context.Context) pg.Client {
 	if s.pgClient == nil {
 		pgCfg, err := pgxpool.ParseConfig(s.PGConfig().DSN())
@@ -104,20 +131,52 @@ func (s *serviceProvider) PGClient(ctx context.Context) pg.Client {
 	return s.pgClient
 }
 
-func (s *serviceProvider) AuthRepository(ctx context.Context) authRepository.Repository {
-	if s.authRepository == nil {
-		s.authRepository = authRepository.NewRepository(s.PGClient(ctx))
+func (s *serviceProvider) UserRepository(ctx context.Context) userRepository.Repository {
+	if s.userRepository == nil {
+		s.userRepository = userRepository.NewRepository(s.PGClient(ctx))
 	}
 
-	return s.authRepository
+	return s.userRepository
+}
+
+func (s *serviceProvider) AccessRepository(ctx context.Context) accessRepository.Repository {
+	if s.accessRepository == nil {
+		s.accessRepository = accessRepository.NewRepository(s.PGClient(ctx))
+	}
+
+	return s.accessRepository
+}
+
+func (s *serviceProvider) UserService(ctx context.Context) userService.Service {
+	if s.userService == nil {
+		s.userService = userService.NewService(s.UserRepository(ctx))
+	}
+
+	return s.userService
 }
 
 func (s *serviceProvider) AuthService(ctx context.Context) authService.Service {
 	if s.authService == nil {
-		s.authService = authService.NewService(s.AuthRepository(ctx))
+		s.authService = authService.NewService(s.AuthConfig(), s.UserRepository(ctx))
 	}
 
 	return s.authService
+}
+
+func (s *serviceProvider) AccessService(ctx context.Context) accessService.Service {
+	if s.accessService == nil {
+		s.accessService = accessService.NewService(s.AuthConfig(), s.AccessRepository(ctx))
+	}
+
+	return s.accessService
+}
+
+func (s *serviceProvider) UserImpl(ctx context.Context) *userV1.Implementation {
+	if s.userImpl == nil {
+		s.userImpl = userV1.NewImplementation(s.UserService(ctx))
+	}
+
+	return s.userImpl
 }
 
 func (s *serviceProvider) AuthImpl(ctx context.Context) *authV1.Implementation {
@@ -126,4 +185,12 @@ func (s *serviceProvider) AuthImpl(ctx context.Context) *authV1.Implementation {
 	}
 
 	return s.authImpl
+}
+
+func (s *serviceProvider) AccessImpl(ctx context.Context) *accessV1.Implementation {
+	if s.accessImpl == nil {
+		s.accessImpl = accessV1.NewImplementation(s.AccessService(ctx))
+	}
+
+	return s.accessImpl
 }
