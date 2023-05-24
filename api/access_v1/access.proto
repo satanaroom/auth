@@ -4,15 +4,13 @@ package access_v1;
 
 option go_package = "github.com/satanaroom/auth/pkg/access_v1;access_v1";
 
+message EmptyResponse {}
+
 service AccessV1 {
-  rpc Check(CheckRequest) returns (CheckResponse);
+  rpc Check(CheckRequest) returns (EmptyResponse);
 }
 
 message CheckRequest {
   string endpoint_address = 1;
-}
-
-message CheckResponse {
-  bool is_allowed = 1;
 }
 

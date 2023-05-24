@@ -15,45 +15,45 @@ const authPrefix = "Bearer "
 
 var rolesStorage = map[string][]int{}
 
-func (s *service) Check(ctx context.Context, endpointAddress string) (bool, error) {
+func (s *service) Check(ctx context.Context, endpointAddress string) error {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return false, errs.ErrMetadataIsNotProvided
+		return errs.ErrMetadataIsNotProvided
 	}
 
 	authHeader, ok := md["authorization"]
 	if !ok || len(authHeader) == 0 {
-		return false, errs.ErrAuthorizationHeaderIsNotProvided
+		return errs.ErrAuthorizationHeaderIsNotProvided
 	}
 
 	if !strings.HasPrefix(authHeader[0], authPrefix) {
-		return false, errs.ErrAuthorizationHeaderFormat
+		return errs.ErrAuthorizationHeaderFormat
 	}
 
 	accessToken := strings.TrimPrefix(authHeader[0], authPrefix)
 
 	claims, err := utils.VerifyToken(accessToken, s.config.AccessTokenSecretKey())
 	if err != nil {
-		return false, fmt.Errorf("utils.VerifyToken: %w", err)
+		return fmt.Errorf("utils.VerifyToken: %w", err)
 	}
 
 	accessibleRoles, err := s.accessibleRoles(ctx)
 	if err != nil {
-		return false, fmt.Errorf("accessibleRoles: %w", err)
+		return fmt.Errorf("accessibleRoles: %w", err)
 	}
 
 	role, ok := accessibleRoles[endpointAddress]
 	if !ok {
-		return true, nil
+		return nil
 	}
 
 	for _, r := range role {
 		if claims.Role == model.Role(r) {
-			return true, nil
+			return nil
 		}
 	}
 
-	return false, errs.ErrAccessDenied
+	return errs.ErrAccessDenied
 }
 
 func (s *service) accessibleRoles(ctx context.Context) (map[string][]int, error) {

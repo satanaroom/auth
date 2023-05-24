@@ -10,11 +10,11 @@ import (
 var _ AuthConfig = (*authConfig)(nil)
 
 const (
-	refreshTokenSecretKeyEnvName = "HTTP_HOST"
-	accessTokenSecretKeyEnvName  = "HTTP_HOST"
+	refreshTokenSecretKeyEnvName = "REFRESH_TOKEN_SECRET_KEY"
+	accessTokenSecretKeyEnvName  = "ACCESS_TOKEN_SECRET_KEY"
 
-	refreshTokenExpirationEnvName = "HTTP_HOST"
-	accessTokenExpirationEnvName  = "HTTP_HOST"
+	refreshTokenExpirationEnvName = "REFRESH_TOKEN_EXPIRATION_MINUTES"
+	accessTokenExpirationEnvName  = "ACCESS_TOKEN_EXPIRATION_MINUTES"
 )
 
 type AuthConfig interface {

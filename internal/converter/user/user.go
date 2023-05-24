@@ -58,28 +58,17 @@ func ToUsername(username string) model.Username {
 
 func ToUpdateUser(info *desc.UpdateUser) *model.UserRepo {
 	var (
-		usernameValid, emailValid, passwordValid, roleValid, departmentValid bool
-		password                                                             string
-		err                                                                  error
-		deptType                                                             model.Dept
-		deptData                                                             []byte
+		password string
+		err      error
+		deptType model.Dept
+		deptData []byte
 	)
 
-	if info.Username.ProtoReflect().IsValid() {
-		usernameValid = true
-	}
-	if info.Email.ProtoReflect().IsValid() {
-		emailValid = true
-	}
 	if info.Password.ProtoReflect().IsValid() {
 		password, err = utils.GeneratePasswordHash(info.Password.GetValue())
 		if err != nil {
 			logger.Fatalf("generate password hash: %s", err.Error())
 		}
-		passwordValid = true
-	}
-	if info.Role.ProtoReflect().IsValid() {
-		roleValid = true
 	}
 
 	switch info.GetDepartment().(type) {
@@ -104,31 +93,29 @@ func ToUpdateUser(info *desc.UpdateUser) *model.UserRepo {
 		}
 	}
 
-	if deptType != 0 {
-		departmentValid = true
-	}
-
 	return &model.UserRepo{
 		Username: sql.NullString{
 			String: info.Username.GetValue(),
-			Valid:  usernameValid,
+			Valid:  info.Username.ProtoReflect().IsValid(),
 		},
 		Email: sql.NullString{
 			String: info.Email.GetValue(),
-			Valid:  emailValid,
+			Valid:  info.Email.ProtoReflect().IsValid(),
 		},
 		Password: sql.NullString{
 			String: password,
-			Valid:  passwordValid,
+			Valid:  info.Password.ProtoReflect().IsValid(),
 		},
 		Role: sql.NullInt32{
 			Int32: info.Role.GetValue(),
-			Valid: roleValid,
+			Valid: info.Role.ProtoReflect().IsValid(),
 		},
 		Department: deptData,
 		DepartmentType: sql.NullInt32{
 			Int32: int32(deptType),
-			Valid: departmentValid,
+			Valid: func(departmentType model.Dept) bool {
+				return deptType != 0
+			}(deptType),
 		},
 	}
 }

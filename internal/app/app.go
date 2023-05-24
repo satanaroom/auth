@@ -14,10 +14,10 @@ import (
 	"github.com/satanaroom/auth/internal/closer"
 	"github.com/satanaroom/auth/internal/config"
 	"github.com/satanaroom/auth/internal/interceptor"
-	descAccessV1 "github.com/satanaroom/auth/pkg/access_v1"
-	authUserV1 "github.com/satanaroom/auth/pkg/auth_v1"
+	accessV1 "github.com/satanaroom/auth/pkg/access_v1"
+	authV1 "github.com/satanaroom/auth/pkg/auth_v1"
 	"github.com/satanaroom/auth/pkg/logger"
-	descUserV1 "github.com/satanaroom/auth/pkg/user_v1"
+	userV1 "github.com/satanaroom/auth/pkg/user_v1"
 
 	_ "github.com/satanaroom/auth/statik"
 	"google.golang.org/grpc"
@@ -107,9 +107,9 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 
 	reflection.Register(a.grpcServer)
 
-	descUserV1.RegisterUserV1Server(a.grpcServer, a.serviceProvider.UserImpl(ctx))
-	authUserV1.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.AuthImpl(ctx))
-	descAccessV1.RegisterAccessV1Server(a.grpcServer, a.serviceProvider.AccessImpl(ctx))
+	userV1.RegisterUserV1Server(a.grpcServer, a.serviceProvider.UserImpl(ctx))
+	authV1.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.AuthImpl(ctx))
+	accessV1.RegisterAccessV1Server(a.grpcServer, a.serviceProvider.AccessImpl(ctx))
 
 	return nil
 }
@@ -121,7 +121,7 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
-	if err := descUserV1.RegisterUserV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Host(), opts); err != nil {
+	if err := userV1.RegisterUserV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Host(), opts); err != nil {
 		return fmt.Errorf("register user v1 handler from endpoint: %w", err)
 	}
 

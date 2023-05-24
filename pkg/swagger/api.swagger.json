@@ -17,13 +17,8 @@
   ],
   "paths": {},
   "definitions": {
-    "access_v1CheckResponse": {
-      "type": "object",
-      "properties": {
-        "isAllowed": {
-          "type": "boolean"
-        }
-      }
+    "access_v1EmptyResponse": {
+      "type": "object"
     },
     "protobufAny": {
       "type": "object",

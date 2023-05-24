@@ -35,6 +35,106 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on EmptyResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *EmptyResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on EmptyResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in EmptyResponseMultiError, or
+// nil if none found.
+func (m *EmptyResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *EmptyResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return EmptyResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// EmptyResponseMultiError is an error wrapping multiple validation errors
+// returned by EmptyResponse.ValidateAll() if the designated constraints
+// aren't met.
+type EmptyResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m EmptyResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m EmptyResponseMultiError) AllErrors() []error { return m }
+
+// EmptyResponseValidationError is the validation error returned by
+// EmptyResponse.Validate if the designated constraints aren't met.
+type EmptyResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EmptyResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EmptyResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EmptyResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EmptyResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EmptyResponseValidationError) ErrorName() string { return "EmptyResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e EmptyResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEmptyResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EmptyResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EmptyResponseValidationError{}
+
 // Validate checks the field values on CheckRequest with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -135,105 +235,3 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CheckRequestValidationError{}
-
-// Validate checks the field values on CheckResponse with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *CheckResponse) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on CheckResponse with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in CheckResponseMultiError, or
-// nil if none found.
-func (m *CheckResponse) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *CheckResponse) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for IsAllowed
-
-	if len(errors) > 0 {
-		return CheckResponseMultiError(errors)
-	}
-
-	return nil
-}
-
-// CheckResponseMultiError is an error wrapping multiple validation errors
-// returned by CheckResponse.ValidateAll() if the designated constraints
-// aren't met.
-type CheckResponseMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m CheckResponseMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m CheckResponseMultiError) AllErrors() []error { return m }
-
-// CheckResponseValidationError is the validation error returned by
-// CheckResponse.Validate if the designated constraints aren't met.
-type CheckResponseValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e CheckResponseValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e CheckResponseValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e CheckResponseValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e CheckResponseValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e CheckResponseValidationError) ErrorName() string { return "CheckResponseValidationError" }
-
-// Error satisfies the builtin error interface
-func (e CheckResponseValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sCheckResponse.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = CheckResponseValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = CheckResponseValidationError{}

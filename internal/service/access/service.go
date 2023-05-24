@@ -10,7 +10,7 @@ import (
 var _ Service = (*service)(nil)
 
 type Service interface {
-	Check(ctx context.Context, endpointAddress string) (bool, error)
+	Check(ctx context.Context, endpointAddress string) error
 }
 
 type service struct {
