@@ -8,7 +8,7 @@ import (
 )
 
 func (s *service) GetAccessToken(ctx context.Context, refreshToken string) (string, error) {
-	claims, err := utils.VerifyToken(refreshToken, []byte{})
+	claims, err := utils.VerifyToken(refreshToken, s.config.RefreshTokenSecretKey())
 	if err != nil {
 		return "", fmt.Errorf("utils.VerifyToken: %w", err)
 	}

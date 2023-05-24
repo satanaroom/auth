@@ -6,13 +6,14 @@ import (
 	"strings"
 
 	"github.com/satanaroom/auth/internal/errs"
+	"github.com/satanaroom/auth/internal/model"
 	"github.com/satanaroom/auth/internal/utils"
 	"google.golang.org/grpc/metadata"
 )
 
 const authPrefix = "Bearer "
 
-var rolesStorage = map[string]string{}
+var rolesStorage = map[string][]int{}
 
 func (s *service) Check(ctx context.Context, endpointAddress string) (bool, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
@@ -46,16 +47,18 @@ func (s *service) Check(ctx context.Context, endpointAddress string) (bool, erro
 		return true, nil
 	}
 
-	if claims.Role != role {
-		return false, errs.ErrAccessDenied
+	for _, r := range role {
+		if claims.Role == model.Role(r) {
+			return true, nil
+		}
 	}
 
-	return true, nil
+	return false, errs.ErrAccessDenied
 }
 
-func (s *service) accessibleRoles(ctx context.Context) (map[string]string, error) {
+func (s *service) accessibleRoles(ctx context.Context) (map[string][]int, error) {
 	if rolesStorage == nil {
-		rolesStorage = make(map[string]string)
+		rolesStorage = make(map[string][]int)
 
 		accessInfo, err := s.accessRepository.GetList(ctx)
 		if err != nil {

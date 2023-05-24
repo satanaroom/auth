@@ -14,8 +14,7 @@ func GenerateToken(user *model.User, secretKey []byte, duration time.Duration) (
 			ExpiresAt: time.Now().Add(duration).Unix(),
 		},
 		Username: user.Username,
-		// TODO: role converter
-		Role: "",
+		Role:     user.Role,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -36,9 +35,8 @@ func VerifyToken(token string, secretKey []byte) (*model.UserClaims, error) {
 			return secretKey, nil
 		},
 	)
-
 	if err != nil {
-		return nil, fmt.Errorf("jwt.ParseWithClaims: %w", err)
+		return nil, fmt.Errorf("invalid token: %w", err)
 	}
 
 	claims, ok := t.Claims.(*model.UserClaims)

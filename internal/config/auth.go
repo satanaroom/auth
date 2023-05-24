@@ -46,8 +46,8 @@ func NewAuthConfig() (*authConfig, error) {
 	return &authConfig{
 		refreshTokenSecretKey:  decode(refreshTokenSecretKey),
 		accessTokenSecretKey:   decode(accessTokenSecretKey),
-		refreshTokenExpiration: time.Duration(refreshTokenExpiration),
-		accessTokenExpiration:  time.Duration(accessTokenExpiration),
+		refreshTokenExpiration: time.Minute * time.Duration(refreshTokenExpiration),
+		accessTokenExpiration:  time.Minute * time.Duration(accessTokenExpiration),
 	}, nil
 }
 
