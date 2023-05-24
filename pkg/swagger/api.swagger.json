@@ -17,9 +17,6 @@
   ],
   "paths": {},
   "definitions": {
-    "access_v1EmptyResponse": {
-      "type": "object"
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
