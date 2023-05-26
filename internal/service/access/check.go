@@ -13,7 +13,7 @@ import (
 
 const authPrefix = "Bearer "
 
-var rolesStorage = map[string][]int{}
+var rolesStorage map[string][]int
 
 func (s *service) Check(ctx context.Context, endpointAddress string) error {
 	md, ok := metadata.FromIncomingContext(ctx)

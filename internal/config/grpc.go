@@ -6,7 +6,7 @@ import (
 
 var _ GRPCConfig = (*grpcConfig)(nil)
 
-const grpcHostEnvName = "GRPC_HOST"
+const grpcHostEnvName = "GRPC_AUTH_HOST"
 
 type GRPCConfig interface {
 	Host() string

@@ -148,7 +148,9 @@ func (a *App) initSwaggerServer(_ context.Context) error {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", http.StripPrefix("/", http.FileServer(statikFs)))
-	mux.HandleFunc("/api.swagger.json/", serveSwaggerFile("/api.swagger.json"))
+	mux.HandleFunc("/access.swagger.json/", serveSwaggerFile("/access.swagger.json"))
+	mux.HandleFunc("/user.swagger.json/", serveSwaggerFile("/user.swagger.json"))
+	mux.HandleFunc("/auth.swagger.json/", serveSwaggerFile("/auth.swagger.json"))
 
 	a.swagger = &http.Server{
 		Addr:    a.serviceProvider.SwaggerConfig().Host(),

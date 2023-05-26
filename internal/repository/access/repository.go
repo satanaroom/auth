@@ -11,7 +11,7 @@ import (
 
 var _ Repository = (*repository)(nil)
 
-const tableName = "access"
+const tableName = "accesses"
 
 type Repository interface {
 	GetList(ctx context.Context) ([]model.AccessInfo, error)

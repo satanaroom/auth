@@ -6,7 +6,7 @@ import (
 
 var _ HTTPConfig = (*httpConfig)(nil)
 
-const httpHostEnvName = "HTTP_HOST"
+const httpHostEnvName = "HTTP_AUTH_HOST"
 
 type HTTPConfig interface {
 	Host() string

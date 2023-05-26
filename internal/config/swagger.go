@@ -6,7 +6,7 @@ import (
 
 var _ SwaggerConfig = (*swaggerConfig)(nil)
 
-const swaggerHostEnvName = "SWAGGER_HOST"
+const swaggerHostEnvName = "SWAGGER_AUTH_HOST"
 
 type SwaggerConfig interface {
 	Host() string

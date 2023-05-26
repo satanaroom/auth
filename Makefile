@@ -28,7 +28,7 @@ generate-user-api:
     --plugin=protoc-gen-validate=bin/protoc-gen-validate \
     --grpc-gateway_out=pkg/user_v1 --grpc-gateway_opt=paths=source_relative \
     --plugin=protoc-gen-go-grpc-gateway=bin/protoc-gen-go-grpc-gateway \
-    --openapiv2_out=allow_merge=true,merge_file_name=api:pkg/swagger \
+    --openapiv2_out=allow_merge=true,merge_file_name=user:pkg/swagger \
 	--plugin=protoc-gen-openapiv2=bin/protoc-gen-openapiv2 \
 	api/user_v1/user.proto
 
@@ -43,7 +43,7 @@ generate-auth-api:
     --plugin=protoc-gen-validate=bin/protoc-gen-validate \
     --grpc-gateway_out=pkg/auth_v1 --grpc-gateway_opt=paths=source_relative \
     --plugin=protoc-gen-go-grpc-gateway=bin/protoc-gen-go-grpc-gateway \
-    --openapiv2_out=allow_merge=true,merge_file_name=api:pkg/swagger \
+    --openapiv2_out=allow_merge=true,merge_file_name=auth:pkg/swagger \
 	--plugin=protoc-gen-openapiv2=bin/protoc-gen-openapiv2 \
 	api/auth_v1/auth.proto
 
@@ -58,7 +58,7 @@ generate-access-api:
     --plugin=protoc-gen-validate=bin/protoc-gen-validate \
     --grpc-gateway_out=pkg/access_v1 --grpc-gateway_opt=paths=source_relative \
     --plugin=protoc-gen-go-grpc-gateway=bin/protoc-gen-go-grpc-gateway \
-    --openapiv2_out=allow_merge=true,merge_file_name=api:pkg/swagger \
+    --openapiv2_out=allow_merge=true,merge_file_name=access:pkg/swagger \
 	--plugin=protoc-gen-openapiv2=bin/protoc-gen-openapiv2 \
 	api/access_v1/access.proto
 
