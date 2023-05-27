@@ -7,13 +7,18 @@ import (
 	"net"
 	"net/http"
 	"sync"
+	"time"
 
+	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rakyll/statik/fs"
 	"github.com/rs/cors"
 	"github.com/satanaroom/auth/internal/closer"
 	"github.com/satanaroom/auth/internal/config"
 	"github.com/satanaroom/auth/internal/interceptor"
+	"github.com/satanaroom/auth/internal/limiter"
+	metric "github.com/satanaroom/auth/internal/metrics"
 	accessV1 "github.com/satanaroom/auth/pkg/access_v1"
 	authV1 "github.com/satanaroom/auth/pkg/auth_v1"
 	"github.com/satanaroom/auth/pkg/logger"
@@ -26,10 +31,11 @@ import (
 )
 
 type App struct {
-	serviceProvider *serviceProvider
-	grpcServer      *grpc.Server
-	httpServer      *http.Server
-	swagger         *http.Server
+	serviceProvider  *serviceProvider
+	grpcServer       *grpc.Server
+	httpServer       *http.Server
+	swaggerServer    *http.Server
+	prometheusServer *http.Server
 }
 
 func NewApp(ctx context.Context) (*App, error) {
@@ -50,7 +56,7 @@ func (a *App) Run() error {
 
 	wg := sync.WaitGroup{}
 
-	wg.Add(3)
+	wg.Add(4)
 	go func() {
 		defer wg.Done()
 		if err := a.runGRPCServer(); err != nil {
@@ -72,6 +78,13 @@ func (a *App) Run() error {
 		}
 	}()
 
+	go func() {
+		defer wg.Done()
+		if err := a.runPrometheusServer(); err != nil {
+			logger.Fatalf("run prometheus server: %s", err.Error())
+		}
+	}()
+
 	wg.Wait()
 
 	return nil
@@ -80,10 +93,12 @@ func (a *App) Run() error {
 func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(context.Context) error{
 		config.Init,
+		metric.Init,
 		a.initServiceProvider,
 		a.initGRPCServer,
 		a.initHTTPServer,
 		a.initSwaggerServer,
+		a.initPrometheusServer,
 	}
 
 	for _, f := range inits {
@@ -101,8 +116,24 @@ func (a *App) initServiceProvider(_ context.Context) error {
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {
+	//creds, err := credentials.NewServerTLSFromFile("service.pem", "service.key")
+	//if err != nil {
+	//	return fmt.Errorf("new server tls from file: %w", err)
+	//}
+
+	// TODO: configure rate limiter
+	rateLimiter := limiter.NewTokenBucketLimiter(ctx, 10, time.Second)
+
 	a.grpcServer = grpc.NewServer(
-		grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
+		//grpc.Creds(creds),
+		grpc.UnaryInterceptor(
+			grpcMiddleware.ChainUnaryServer(
+				interceptor.ValidateInterceptor,
+				interceptor.ErrorCodesInterceptor,
+				interceptor.NewRateLimiterInterceptor(rateLimiter).Unary,
+				interceptor.MetricsInterceptor,
+			),
+		),
 	)
 
 	reflection.Register(a.grpcServer)
@@ -152,8 +183,21 @@ func (a *App) initSwaggerServer(_ context.Context) error {
 	mux.HandleFunc("/user.swagger.json/", serveSwaggerFile("/user.swagger.json"))
 	mux.HandleFunc("/auth.swagger.json/", serveSwaggerFile("/auth.swagger.json"))
 
-	a.swagger = &http.Server{
+	a.swaggerServer = &http.Server{
 		Addr:    a.serviceProvider.SwaggerConfig().Host(),
+		Handler: mux,
+	}
+
+	return nil
+}
+
+func (a *App) initPrometheusServer(_ context.Context) error {
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+
+	a.prometheusServer = &http.Server{
+		//Addr:    a.serviceProvider.PrometheusConfig().Host(),
+		Addr:    "localhost:9090",
 		Handler: mux,
 	}
 
@@ -188,7 +232,17 @@ func (a *App) runHTTPServer() error {
 func (a *App) runSwaggerServer() error {
 	logger.Infof("Swagger server is running on %s", a.serviceProvider.SwaggerConfig().Host())
 
-	if err := a.swagger.ListenAndServe(); err != nil {
+	if err := a.swaggerServer.ListenAndServe(); err != nil {
+		return fmt.Errorf("failed to serve: %s", err.Error())
+	}
+
+	return nil
+}
+
+func (a *App) runPrometheusServer() error {
+	//logger.Infof("Prometheus server is running on %s", a.serviceProvider.PrometheusConfig().Host())
+
+	if err := a.prometheusServer.ListenAndServe(); err != nil {
 		return fmt.Errorf("failed to serve: %s", err.Error())
 	}
 

@@ -37,7 +37,7 @@ var (
 
 // Validate checks the field values on GetRefreshTokenRequest with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, the first sys encountered is returned, or nil if there are no violations.
 func (m *GetRefreshTokenRequest) Validate() error {
 	return m.validate(false)
 }
@@ -68,12 +68,12 @@ func (m *GetRefreshTokenRequest) validate(all bool) error {
 	return nil
 }
 
-// GetRefreshTokenRequestMultiError is an error wrapping multiple validation
+// GetRefreshTokenRequestMultiError is an sys wrapping multiple validation
 // errors returned by GetRefreshTokenRequest.ValidateAll() if the designated
 // constraints aren't met.
 type GetRefreshTokenRequestMultiError []error
 
-// Error returns a concatenation of all the error messages it wraps.
+// Error returns a concatenation of all the sys messages it wraps.
 func (m GetRefreshTokenRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
@@ -85,7 +85,7 @@ func (m GetRefreshTokenRequestMultiError) Error() string {
 // AllErrors returns a list of validation violation errors.
 func (m GetRefreshTokenRequestMultiError) AllErrors() []error { return m }
 
-// GetRefreshTokenRequestValidationError is the validation error returned by
+// GetRefreshTokenRequestValidationError is the validation sys returned by
 // GetRefreshTokenRequest.Validate if the designated constraints aren't met.
 type GetRefreshTokenRequestValidationError struct {
 	field  string
@@ -106,12 +106,12 @@ func (e GetRefreshTokenRequestValidationError) Cause() error { return e.cause }
 // Key function returns key value.
 func (e GetRefreshTokenRequestValidationError) Key() bool { return e.key }
 
-// ErrorName returns error name.
+// ErrorName returns sys name.
 func (e GetRefreshTokenRequestValidationError) ErrorName() string {
 	return "GetRefreshTokenRequestValidationError"
 }
 
-// Error satisfies the builtin error interface
+// Error satisfies the builtin sys interface
 func (e GetRefreshTokenRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
@@ -143,7 +143,7 @@ var _ interface {
 
 // Validate checks the field values on GetRefreshTokenResponse with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, the first sys encountered is returned, or nil if there are no violations.
 func (m *GetRefreshTokenResponse) Validate() error {
 	return m.validate(false)
 }
@@ -172,12 +172,12 @@ func (m *GetRefreshTokenResponse) validate(all bool) error {
 	return nil
 }
 
-// GetRefreshTokenResponseMultiError is an error wrapping multiple validation
+// GetRefreshTokenResponseMultiError is an sys wrapping multiple validation
 // errors returned by GetRefreshTokenResponse.ValidateAll() if the designated
 // constraints aren't met.
 type GetRefreshTokenResponseMultiError []error
 
-// Error returns a concatenation of all the error messages it wraps.
+// Error returns a concatenation of all the sys messages it wraps.
 func (m GetRefreshTokenResponseMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
@@ -189,7 +189,7 @@ func (m GetRefreshTokenResponseMultiError) Error() string {
 // AllErrors returns a list of validation violation errors.
 func (m GetRefreshTokenResponseMultiError) AllErrors() []error { return m }
 
-// GetRefreshTokenResponseValidationError is the validation error returned by
+// GetRefreshTokenResponseValidationError is the validation sys returned by
 // GetRefreshTokenResponse.Validate if the designated constraints aren't met.
 type GetRefreshTokenResponseValidationError struct {
 	field  string
@@ -210,12 +210,12 @@ func (e GetRefreshTokenResponseValidationError) Cause() error { return e.cause }
 // Key function returns key value.
 func (e GetRefreshTokenResponseValidationError) Key() bool { return e.key }
 
-// ErrorName returns error name.
+// ErrorName returns sys name.
 func (e GetRefreshTokenResponseValidationError) ErrorName() string {
 	return "GetRefreshTokenResponseValidationError"
 }
 
-// Error satisfies the builtin error interface
+// Error satisfies the builtin sys interface
 func (e GetRefreshTokenResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
@@ -247,7 +247,7 @@ var _ interface {
 
 // Validate checks the field values on GetAccessTokenRequest with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, the first sys encountered is returned, or nil if there are no violations.
 func (m *GetAccessTokenRequest) Validate() error {
 	return m.validate(false)
 }
@@ -276,12 +276,12 @@ func (m *GetAccessTokenRequest) validate(all bool) error {
 	return nil
 }
 
-// GetAccessTokenRequestMultiError is an error wrapping multiple validation
+// GetAccessTokenRequestMultiError is an sys wrapping multiple validation
 // errors returned by GetAccessTokenRequest.ValidateAll() if the designated
 // constraints aren't met.
 type GetAccessTokenRequestMultiError []error
 
-// Error returns a concatenation of all the error messages it wraps.
+// Error returns a concatenation of all the sys messages it wraps.
 func (m GetAccessTokenRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
@@ -293,7 +293,7 @@ func (m GetAccessTokenRequestMultiError) Error() string {
 // AllErrors returns a list of validation violation errors.
 func (m GetAccessTokenRequestMultiError) AllErrors() []error { return m }
 
-// GetAccessTokenRequestValidationError is the validation error returned by
+// GetAccessTokenRequestValidationError is the validation sys returned by
 // GetAccessTokenRequest.Validate if the designated constraints aren't met.
 type GetAccessTokenRequestValidationError struct {
 	field  string
@@ -314,12 +314,12 @@ func (e GetAccessTokenRequestValidationError) Cause() error { return e.cause }
 // Key function returns key value.
 func (e GetAccessTokenRequestValidationError) Key() bool { return e.key }
 
-// ErrorName returns error name.
+// ErrorName returns sys name.
 func (e GetAccessTokenRequestValidationError) ErrorName() string {
 	return "GetAccessTokenRequestValidationError"
 }
 
-// Error satisfies the builtin error interface
+// Error satisfies the builtin sys interface
 func (e GetAccessTokenRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
@@ -351,7 +351,7 @@ var _ interface {
 
 // Validate checks the field values on GetAccessTokenResponse with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
+// violated, the first sys encountered is returned, or nil if there are no violations.
 func (m *GetAccessTokenResponse) Validate() error {
 	return m.validate(false)
 }
@@ -380,12 +380,12 @@ func (m *GetAccessTokenResponse) validate(all bool) error {
 	return nil
 }
 
-// GetAccessTokenResponseMultiError is an error wrapping multiple validation
+// GetAccessTokenResponseMultiError is an sys wrapping multiple validation
 // errors returned by GetAccessTokenResponse.ValidateAll() if the designated
 // constraints aren't met.
 type GetAccessTokenResponseMultiError []error
 
-// Error returns a concatenation of all the error messages it wraps.
+// Error returns a concatenation of all the sys messages it wraps.
 func (m GetAccessTokenResponseMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
@@ -397,7 +397,7 @@ func (m GetAccessTokenResponseMultiError) Error() string {
 // AllErrors returns a list of validation violation errors.
 func (m GetAccessTokenResponseMultiError) AllErrors() []error { return m }
 
-// GetAccessTokenResponseValidationError is the validation error returned by
+// GetAccessTokenResponseValidationError is the validation sys returned by
 // GetAccessTokenResponse.Validate if the designated constraints aren't met.
 type GetAccessTokenResponseValidationError struct {
 	field  string
@@ -418,12 +418,12 @@ func (e GetAccessTokenResponseValidationError) Cause() error { return e.cause }
 // Key function returns key value.
 func (e GetAccessTokenResponseValidationError) Key() bool { return e.key }
 
-// ErrorName returns error name.
+// ErrorName returns sys name.
 func (e GetAccessTokenResponseValidationError) ErrorName() string {
 	return "GetAccessTokenResponseValidationError"
 }
 
-// Error satisfies the builtin error interface
+// Error satisfies the builtin sys interface
 func (e GetAccessTokenResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {

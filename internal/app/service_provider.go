@@ -27,6 +27,9 @@ type serviceProvider struct {
 	swaggerConfig config.SwaggerConfig
 	authConfig    config.AuthConfig
 
+	// TODO: rate limiter config
+	// TODO: rate limiter object
+
 	pgClient         pg.Client
 	userRepository   userRepository.Repository
 	accessRepository accessRepository.Repository

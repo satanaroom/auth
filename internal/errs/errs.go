@@ -4,8 +4,8 @@ import "errors"
 
 var (
 	ErrPasswordMismatch                 = errors.New("password and password confirm do not match")
-	ErrUserToResponse                   = errors.New("converting user to response error")
-	ErrUserConverting                   = errors.New("converting error")
+	ErrUserToResponse                   = errors.New("converting user to response sys")
+	ErrUserConverting                   = errors.New("converting sys")
 	ErrUserNotFound                     = errors.New("user not found")
 	ErrMetadataIsNotProvided            = errors.New("metadata is not provided")
 	ErrAuthorizationHeaderIsNotProvided = errors.New("authorization header is not provided")
