@@ -23,6 +23,7 @@ import (
 	authV1 "github.com/satanaroom/auth/pkg/auth_v1"
 	"github.com/satanaroom/auth/pkg/logger"
 	userV1 "github.com/satanaroom/auth/pkg/user_v1"
+	"github.com/sony/gobreaker"
 
 	_ "github.com/satanaroom/auth/statik"
 	"google.golang.org/grpc"
@@ -123,6 +124,22 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 
 	// TODO: configure rate limiter
 	rateLimiter := limiter.NewTokenBucketLimiter(ctx, 10, time.Second)
+	cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{
+		Name:        "auth-service",
+		MaxRequests: 3,
+		Interval:    10 * time.Second,
+		Timeout:     5 * time.Second,
+		ReadyToTrip: func(counts gobreaker.Counts) bool {
+			failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
+			if failureRatio >= 0.6 {
+				return false
+			}
+			return true
+		},
+		OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) {
+			logger.Infof("Circuit breaker: %s, from: %s, to: %s", name, from.String(), to.String())
+		},
+	})
 
 	a.grpcServer = grpc.NewServer(
 		//grpc.Creds(creds),
@@ -132,6 +149,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 				interceptor.ErrorCodesInterceptor,
 				interceptor.NewRateLimiterInterceptor(rateLimiter).Unary,
 				interceptor.MetricsInterceptor,
+				interceptor.NewCircuitBreakerInterceptor(cb).Unary,
 			),
 		),
 	)
