@@ -7,6 +7,9 @@ import (
 	accessV1 "github.com/satanaroom/auth/internal/api/access_v1"
 	authV1 "github.com/satanaroom/auth/internal/api/auth_v1"
 	userV1 "github.com/satanaroom/auth/internal/api/user_v1"
+	"github.com/satanaroom/auth/internal/limiter"
+	"github.com/sony/gobreaker"
+	"google.golang.org/grpc/credentials"
 
 	"github.com/satanaroom/auth/internal/client/pg"
 	"github.com/satanaroom/auth/internal/closer"
@@ -21,14 +24,19 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig      config.PGConfig
-	grpcConfig    config.GRPCConfig
-	httpConfig    config.HTTPConfig
-	swaggerConfig config.SwaggerConfig
-	authConfig    config.AuthConfig
+	pgConfig             config.PGConfig
+	grpcConfig           config.GRPCConfig
+	httpConfig           config.HTTPConfig
+	swaggerConfig        config.SwaggerConfig
+	authConfig           config.AuthConfig
+	prometheusConfig     config.PrometheusConfig
+	rateLimiterConfig    config.RateLimiterConfig
+	circuitBreakerConfig config.CircuitBreakerConfig
+	tlsConfig            config.TLSConfig
 
-	// TODO: rate limiter config
-	// TODO: rate limiter object
+	tlsCredentials credentials.TransportCredentials
+	rateLimiter    *limiter.TokenBucketLimiter
+	circuitBreaker *gobreaker.CircuitBreaker
 
 	pgClient         pg.Client
 	userRepository   userRepository.Repository
@@ -112,6 +120,58 @@ func (s *serviceProvider) AuthConfig() config.AuthConfig {
 	return s.authConfig
 }
 
+func (s *serviceProvider) PrometheusConfig() config.PrometheusConfig {
+	if s.prometheusConfig == nil {
+		cfg, err := config.NewPrometheusConfig()
+		if err != nil {
+			logger.Fatalf("failed to get prometheus config: %s", err.Error())
+		}
+
+		s.prometheusConfig = cfg
+	}
+
+	return s.prometheusConfig
+}
+
+func (s *serviceProvider) CircuitBreakerConfig() config.CircuitBreakerConfig {
+	if s.circuitBreakerConfig == nil {
+		cfg, err := config.NewCircuitBreakerConfig()
+		if err != nil {
+			logger.Fatalf("failed to get circuit breaker config: %s", err.Error())
+		}
+
+		s.circuitBreakerConfig = cfg
+	}
+
+	return s.circuitBreakerConfig
+}
+
+func (s *serviceProvider) RateLimiterConfig() config.RateLimiterConfig {
+	if s.rateLimiterConfig == nil {
+		cfg, err := config.NewRateLimiterConfig()
+		if err != nil {
+			logger.Fatalf("failed to get rate limiter config: %s", err.Error())
+		}
+
+		s.rateLimiterConfig = cfg
+	}
+
+	return s.rateLimiterConfig
+}
+
+func (s *serviceProvider) TLSConfig() config.TLSConfig {
+	if s.tlsConfig == nil {
+		cfg, err := config.NewTLSConfig()
+		if err != nil {
+			logger.Fatalf("failed to get TLS config: %s", err.Error())
+		}
+
+		s.tlsConfig = cfg
+	}
+
+	return s.tlsConfig
+}
+
 func (s *serviceProvider) PGClient(ctx context.Context) pg.Client {
 	if s.pgClient == nil {
 		pgCfg, err := pgxpool.ParseConfig(s.PGConfig().DSN())
@@ -132,6 +192,54 @@ func (s *serviceProvider) PGClient(ctx context.Context) pg.Client {
 		s.pgClient = client
 	}
 	return s.pgClient
+}
+
+func (s *serviceProvider) RateLimiter(ctx context.Context) *limiter.TokenBucketLimiter {
+	if s.rateLimiter == nil {
+		s.rateLimiter = limiter.NewTokenBucketLimiter(
+			ctx,
+			s.RateLimiterConfig().Limit(),
+			s.RateLimiterConfig().Period())
+	}
+
+	return s.rateLimiter
+}
+
+func (s *serviceProvider) CircuitBreaker(_ context.Context) *gobreaker.CircuitBreaker {
+	if s.circuitBreaker == nil {
+		s.circuitBreaker = gobreaker.NewCircuitBreaker(gobreaker.Settings{
+			Name:        s.CircuitBreakerConfig().Name(),
+			MaxRequests: s.CircuitBreakerConfig().MaxRequests(),
+			Interval:    s.CircuitBreakerConfig().Interval(),
+			Timeout:     s.CircuitBreakerConfig().Timeout(),
+			ReadyToTrip: func(counts gobreaker.Counts) bool {
+				failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
+				if failureRatio >= s.CircuitBreakerConfig().FailureRatioLimit() {
+					return false
+				}
+				return true
+			},
+			OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) {
+				logger.Infof("Circuit Breaker: %s, changed from %s, to %s",
+					name, from.String(), to.String())
+			},
+		})
+	}
+
+	return s.circuitBreaker
+}
+
+func (s *serviceProvider) TLSCredentials(_ context.Context) credentials.TransportCredentials {
+	if s.tlsCredentials == nil {
+		creds, err := credentials.NewServerTLSFromFile(s.TLSConfig().CertFile(), s.TLSConfig().KeyFile())
+		if err != nil {
+			logger.Fatalf("new server tls from file: %s", err.Error())
+		}
+
+		s.tlsCredentials = creds
+	}
+
+	return s.tlsCredentials
 }
 
 func (s *serviceProvider) UserRepository(ctx context.Context) userRepository.Repository {

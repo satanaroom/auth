@@ -2,6 +2,7 @@ version: '3'
 
 volumes:
   postgres_volume:
+  prometheus_data:
 
 services:
   pg:
@@ -18,7 +19,7 @@ services:
   prometheus:
     image: prom/prometheus
     ports:
-      - "${PROMETHEUS_PORT}:9090"
+      - "9090:9090"
     volumes:
-      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
-      - ./prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus

@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"sync"
-	"time"
 
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -17,14 +16,11 @@ import (
 	"github.com/satanaroom/auth/internal/closer"
 	"github.com/satanaroom/auth/internal/config"
 	"github.com/satanaroom/auth/internal/interceptor"
-	"github.com/satanaroom/auth/internal/limiter"
 	metric "github.com/satanaroom/auth/internal/metrics"
 	accessV1 "github.com/satanaroom/auth/pkg/access_v1"
 	authV1 "github.com/satanaroom/auth/pkg/auth_v1"
 	"github.com/satanaroom/auth/pkg/logger"
 	userV1 "github.com/satanaroom/auth/pkg/user_v1"
-	"github.com/sony/gobreaker"
-
 	_ "github.com/satanaroom/auth/statik"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -117,39 +113,15 @@ func (a *App) initServiceProvider(_ context.Context) error {
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {
-	//creds, err := credentials.NewServerTLSFromFile("service.pem", "service.key")
-	//if err != nil {
-	//	return fmt.Errorf("new server tls from file: %w", err)
-	//}
-
-	// TODO: configure rate limiter
-	rateLimiter := limiter.NewTokenBucketLimiter(ctx, 10, time.Second)
-	cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{
-		Name:        "auth-service",
-		MaxRequests: 3,
-		Interval:    10 * time.Second,
-		Timeout:     5 * time.Second,
-		ReadyToTrip: func(counts gobreaker.Counts) bool {
-			failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
-			if failureRatio >= 0.6 {
-				return false
-			}
-			return true
-		},
-		OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) {
-			logger.Infof("Circuit breaker: %s, from: %s, to: %s", name, from.String(), to.String())
-		},
-	})
-
 	a.grpcServer = grpc.NewServer(
-		//grpc.Creds(creds),
+		grpc.Creds(a.serviceProvider.TLSCredentials(ctx)),
 		grpc.UnaryInterceptor(
 			grpcMiddleware.ChainUnaryServer(
 				interceptor.ValidateInterceptor,
 				interceptor.ErrorCodesInterceptor,
-				interceptor.NewRateLimiterInterceptor(rateLimiter).Unary,
+				interceptor.NewRateLimiterInterceptor(a.serviceProvider.RateLimiter(ctx)).Unary,
 				interceptor.MetricsInterceptor,
-				interceptor.NewCircuitBreakerInterceptor(cb).Unary,
+				interceptor.NewCircuitBreakerInterceptor(a.serviceProvider.CircuitBreaker(ctx)).Unary,
 			),
 		),
 	)
@@ -214,8 +186,7 @@ func (a *App) initPrometheusServer(_ context.Context) error {
 	mux.Handle("/metrics", promhttp.Handler())
 
 	a.prometheusServer = &http.Server{
-		//Addr:    a.serviceProvider.PrometheusConfig().Host(),
-		Addr:    "localhost:9090",
+		Addr:    a.serviceProvider.PrometheusConfig().Host(),
 		Handler: mux,
 	}
 
@@ -258,7 +229,7 @@ func (a *App) runSwaggerServer() error {
 }
 
 func (a *App) runPrometheusServer() error {
-	//logger.Infof("Prometheus server is running on %s", a.serviceProvider.PrometheusConfig().Host())
+	logger.Infof("Prometheus server is running on %s", a.serviceProvider.PrometheusConfig().Host())
 
 	if err := a.prometheusServer.ListenAndServe(); err != nil {
 		return fmt.Errorf("failed to serve: %s", err.Error())
