@@ -23,6 +23,7 @@ go.work
 /.idea
 /bin
 /vendor.protogen
+/statik
 .env
 ca.key
 ca.cert

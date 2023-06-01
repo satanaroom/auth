@@ -37,7 +37,7 @@ var (
 
 // Validate checks the field values on CheckRequest with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
-// sys encountered is returned, or nil if there are no violations.
+// error encountered is returned, or nil if there are no violations.
 func (m *CheckRequest) Validate() error {
 	return m.validate(false)
 }
@@ -66,11 +66,11 @@ func (m *CheckRequest) validate(all bool) error {
 	return nil
 }
 
-// CheckRequestMultiError is an sys wrapping multiple validation errors
+// CheckRequestMultiError is an error wrapping multiple validation errors
 // returned by CheckRequest.ValidateAll() if the designated constraints aren't met.
 type CheckRequestMultiError []error
 
-// Error returns a concatenation of all the sys messages it wraps.
+// Error returns a concatenation of all the error messages it wraps.
 func (m CheckRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
@@ -82,7 +82,7 @@ func (m CheckRequestMultiError) Error() string {
 // AllErrors returns a list of validation violation errors.
 func (m CheckRequestMultiError) AllErrors() []error { return m }
 
-// CheckRequestValidationError is the validation sys returned by
+// CheckRequestValidationError is the validation error returned by
 // CheckRequest.Validate if the designated constraints aren't met.
 type CheckRequestValidationError struct {
 	field  string
@@ -103,10 +103,10 @@ func (e CheckRequestValidationError) Cause() error { return e.cause }
 // Key function returns key value.
 func (e CheckRequestValidationError) Key() bool { return e.key }
 
-// ErrorName returns sys name.
+// ErrorName returns error name.
 func (e CheckRequestValidationError) ErrorName() string { return "CheckRequestValidationError" }
 
-// Error satisfies the builtin sys interface
+// Error satisfies the builtin error interface
 func (e CheckRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
