@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/satanaroom/auth/internal/model"
@@ -24,7 +23,7 @@ func (s *service) Create(ctx context.Context, info *model.UserInfo) (int64, erro
 
 	passwordHash, err := utils.GeneratePasswordHash(info.User.Password)
 	if err != nil {
-		logger.Errorf("generate password hash: %s", err.Error())
+		logger.Errorf("utils.GeneratePasswordHash: %s", err.Error())
 		return 0, sys.NewCommonError("failed to generate password hash", codes.Internal)
 	}
 	info.User.Password = passwordHash
@@ -34,8 +33,8 @@ func (s *service) Create(ctx context.Context, info *model.UserInfo) (int64, erro
 
 	id, err := s.userRepository.Create(ctx, info)
 	if err != nil {
-		logger.Errorf("authRepository.Create: %s", err.Error())
-		return 0, sys.NewCommonError(fmt.Sprintf("failed to create user: %s", err.Error()), codes.Internal)
+		logger.Errorf("userRepository.Create: %s", err.Error())
+		return 0, sys.NewCommonError("failed to create user", codes.Internal)
 	}
 
 	return id, nil
