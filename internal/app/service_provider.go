@@ -214,10 +214,8 @@ func (s *serviceProvider) CircuitBreaker(_ context.Context) *gobreaker.CircuitBr
 			Timeout:     s.CircuitBreakerConfig().Timeout(),
 			ReadyToTrip: func(counts gobreaker.Counts) bool {
 				failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
-				if failureRatio >= s.CircuitBreakerConfig().FailureRatioLimit() {
-					return false
-				}
-				return true
+
+				return failureRatio < s.CircuitBreakerConfig().FailureRatioLimit()
 			},
 			OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) {
 				logger.Infof("Circuit Breaker: %s, changed from %s, to %s",
