@@ -18,7 +18,7 @@ func Init(_ context.Context) error {
 	metrics = &Metrics{
 		requestTotal: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: appPrefix + "request_total",
+				Name: appPrefix + "requests_total",
 				Help: "Количество запросов к серверу",
 			},
 			[]string{"method", "code"},

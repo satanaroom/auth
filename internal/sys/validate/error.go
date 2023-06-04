@@ -29,7 +29,7 @@ func (v *ValidationErrors) Error() string {
 	return string(data)
 }
 
-func IsValidationErrors(err error) bool {
+func IsValidationError(err error) bool {
 	var re *ValidationErrors
 	return errors.As(err, &re)
 }

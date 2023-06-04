@@ -24,26 +24,27 @@ func ErrorCodesInterceptor(ctx context.Context, req interface{}, info *grpc.Unar
 		return resp, nil
 	}
 
-	logger.Errorf(color.RedString("error: %s\n", err.Error()))
+	logger.Errorf(color.RedString("error: %s", err.Error()))
 
 	switch {
 	case sys.IsCommonError(err):
 		commonErr := sys.GetCommonError(err)
 		code := toGRPCCode(commonErr.Code())
 		err = status.Error(code, commonErr.Error())
-	case validate.IsValidationErrors(err):
+	case validate.IsValidationError(err):
 		err = status.Error(grpcCodes.InvalidArgument, err.Error())
 	default:
 		var se GRPCStatus
 		if errors.As(err, &se) {
 			return nil, se.GRPCStatus().Err()
-		}
-		if errors.Is(err, context.Canceled) {
-			err = status.Error(grpcCodes.Canceled, err.Error())
-		} else if errors.Is(err, context.DeadlineExceeded) {
-			err = status.Error(grpcCodes.DeadlineExceeded, err.Error())
 		} else {
-			err = status.Error(grpcCodes.Internal, err.Error())
+			if errors.Is(err, context.Canceled) {
+				err = status.Error(grpcCodes.Canceled, err.Error())
+			} else if errors.Is(err, context.DeadlineExceeded) {
+				err = status.Error(grpcCodes.DeadlineExceeded, err.Error())
+			} else {
+				err = status.Error(grpcCodes.Internal, err.Error())
+			}
 		}
 	}
 

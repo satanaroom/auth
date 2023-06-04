@@ -28,6 +28,8 @@ func (c *CircuitBreakerInterceptor) Unary(ctx context.Context, req interface{}, 
 		if err == gobreaker.ErrOpenState {
 			return nil, status.Errorf(codes.Unavailable, "service unavailable")
 		}
+
+		return nil, err
 	}
 
 	return res, nil

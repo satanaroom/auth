@@ -46,12 +46,3 @@ func (l *TokenBucketLimiter) Allow() bool {
 		return false
 	}
 }
-
-//func clientOpts() {
-//	var opts []grpc.DialOption
-//	opts = append(opts, grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(
-//		grpc_retry.WithCodes(codes.Unavailable, codes.ResourceExhausted),
-//		grpc_retry.WithMax(5),
-//		grpc_retry.WithBackoff(grpc_retry.BackoffLinear())
-//		)))
-//}

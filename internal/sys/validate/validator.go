@@ -10,7 +10,7 @@ func Validate(ctx context.Context, conditions ...Condition) error {
 	for _, condition := range conditions {
 		err := condition(ctx)
 		if err != nil {
-			if IsValidationErrors(err) {
+			if IsValidationError(err) {
 				ve.addError(err.Error())
 				continue
 			}

@@ -111,7 +111,7 @@ gen:
 
 cert:
 	openssl genrsa -out ca.key 4096
-	openssl req -new -x509 -key ca.key -sha256 -subj "/C=US/ST=NJ/O=CA, Inc." -days 365 -out ca.cert
+	openssl req -new -x509 -key ca.key -sha256 -subj "/C=US/ST=NJ/O=Test, Inc." -days 365 -out ca.cert
 	openssl genrsa -out service.key 4096
 	openssl req -new -key service.key -out service.csr -config certificate.conf
 	openssl x509 -req -in service.csr -CA ca.cert -CAkey ca.key -CAcreateserial \
@@ -121,9 +121,9 @@ grpc-load-test:
 	ghz \
 		--proto api/user_v1/user.proto \
 		--import-paths=vendor.protogen \
-		--call user.UserV1.Get \
+		--call user_v1.UserV1.Get \
 		--data '' \
-		--rpc 100 \
+		--rps 100 \
 		--total 1000 \
 		--cacert=service.pem \
 		localhost:50051

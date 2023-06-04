@@ -9,7 +9,6 @@ import (
 	"github.com/satanaroom/auth/internal/sys/codes"
 	"github.com/satanaroom/auth/internal/sys/validate"
 	"github.com/satanaroom/auth/internal/utils"
-	"github.com/satanaroom/auth/pkg/logger"
 )
 
 func (s *service) Create(ctx context.Context, info *model.UserInfo) (int64, error) {
@@ -17,13 +16,11 @@ func (s *service) Create(ctx context.Context, info *model.UserInfo) (int64, erro
 		ctx,
 		validatePassword(info.User.Password, info.PasswordConfirm),
 	); err != nil {
-		logger.Errorf("validate: %s", err.Error())
 		return 0, err
 	}
 
 	passwordHash, err := utils.GeneratePasswordHash(info.User.Password)
 	if err != nil {
-		logger.Errorf("utils.GeneratePasswordHash: %s", err.Error())
 		return 0, sys.NewCommonError("failed to generate password hash", codes.Internal)
 	}
 	info.User.Password = passwordHash
@@ -33,7 +30,6 @@ func (s *service) Create(ctx context.Context, info *model.UserInfo) (int64, erro
 
 	id, err := s.userRepository.Create(ctx, info)
 	if err != nil {
-		logger.Errorf("userRepository.Create: %s", err.Error())
 		return 0, sys.NewCommonError("failed to create user", codes.Internal)
 	}
 
