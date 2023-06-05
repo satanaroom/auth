@@ -7,6 +7,8 @@ import (
 
 	"github.com/satanaroom/auth/internal/errs"
 	"github.com/satanaroom/auth/internal/model"
+	"github.com/satanaroom/auth/internal/sys"
+	"github.com/satanaroom/auth/internal/sys/codes"
 	"github.com/satanaroom/auth/internal/utils"
 	"google.golang.org/grpc/metadata"
 )
@@ -18,28 +20,27 @@ var rolesStorage map[string][]int
 func (s *service) Check(ctx context.Context, endpointAddress string) error {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return errs.ErrMetadataIsNotProvided
+		return sys.NewCommonError(errs.ErrMetadataIsNotProvided.Error(), codes.DataLoss)
 	}
 
 	authHeader, ok := md["authorization"]
 	if !ok || len(authHeader) == 0 {
-		return errs.ErrAuthorizationHeaderIsNotProvided
+		return sys.NewCommonError(errs.ErrAuthorizationHeaderIsNotProvided.Error(), codes.DataLoss)
 	}
 
 	if !strings.HasPrefix(authHeader[0], authPrefix) {
-		return errs.ErrAuthorizationHeaderFormat
+		return sys.NewCommonError(errs.ErrAuthorizationHeaderFormat.Error(), codes.DataLoss)
 	}
 
-	accessToken := strings.TrimPrefix(authHeader[0], authPrefix)
-
-	claims, err := utils.VerifyToken(accessToken, s.config.AccessTokenSecretKey())
+	claims, err := utils.VerifyToken(strings.TrimPrefix(authHeader[0], authPrefix),
+		s.config.AccessTokenSecretKey())
 	if err != nil {
-		return fmt.Errorf("utils.VerifyToken: %w", err)
+		return sys.NewCommonError(errs.ErrInvalidToken.Error(), codes.InvalidArgument)
 	}
 
 	accessibleRoles, err := s.accessibleRoles(ctx)
 	if err != nil {
-		return fmt.Errorf("accessibleRoles: %w", err)
+		return sys.NewCommonError(errs.ErrAccessDenied.Error(), codes.PermissionDenied)
 	}
 
 	role, ok := accessibleRoles[endpointAddress]
@@ -53,7 +54,7 @@ func (s *service) Check(ctx context.Context, endpointAddress string) error {
 		}
 	}
 
-	return errs.ErrAccessDenied
+	return sys.NewCommonError(errs.ErrAccessDenied.Error(), codes.PermissionDenied)
 }
 
 func (s *service) accessibleRoles(ctx context.Context) (map[string][]int, error) {
@@ -62,7 +63,7 @@ func (s *service) accessibleRoles(ctx context.Context) (map[string][]int, error)
 
 		accessInfo, err := s.accessRepository.GetList(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("accessRepository.GetList: %w", err)
+			return nil, fmt.Errorf("get accesses list: %w", err)
 		}
 
 		for _, info := range accessInfo {

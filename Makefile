@@ -93,17 +93,37 @@ local-migration-up:
 local-migration-down:
 	goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} down -v
 
-.PHONY: lint
 lint:
 	golangci-lint run
 
-.PHONY: cover
 cover:
 	go test -short -count=1 -race -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out
 	rm coverage.out
 
-.PHONY: gen
 gen:
 	mockgen -source=internal/repository/user/repository.go \
 	-destination=internal/repository/mocks/mock_repository.go
+	mockgen -source=internal/repository/access/repository.go \
+	-destination=internal/repository/mocks/mock_repository.go
+	mockgen -source=internal/repository/auth/repository.go \
+	-destination=internal/repository/mocks/mock_repository.go
+
+cert:
+	openssl genrsa -out ca.key 4096
+	openssl req -new -x509 -key ca.key -sha256 -subj "/C=US/ST=NJ/O=Test, Inc." -days 365 -out ca.cert
+	openssl genrsa -out service.key 4096
+	openssl req -new -key service.key -out service.csr -config certificate.conf
+	openssl x509 -req -in service.csr -CA ca.cert -CAkey ca.key -CAcreateserial \
+    		-out service.pem -days 365 -sha256 -extfile certificate.conf -extensions req_ext
+
+grpc-load-test:
+	ghz \
+		--proto api/user_v1/user.proto \
+		--import-paths=vendor.protogen \
+		--call user_v1.UserV1.Get \
+		--data '' \
+		--rps 100 \
+		--total 1000 \
+		--cacert=service.pem \
+		localhost:50051

@@ -24,3 +24,9 @@ go.work
 /bin
 /vendor.protogen
 .env
+ca.key
+ca.cert
+certificate.conf
+service.csr
+service.key
+service.pem

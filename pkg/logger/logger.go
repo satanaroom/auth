@@ -42,3 +42,7 @@ func Fatalf(message string, args ...interface{}) {
 func Info(message string) {
 	getLogger().Info(message)
 }
+
+func Error(message string) {
+	getLogger().Error(message)
+}
