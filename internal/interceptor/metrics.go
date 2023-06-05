@@ -3,7 +3,7 @@ package interceptor
 import (
 	"context"
 
-	metric "github.com/satanaroom/auth/internal/metrics"
+	"github.com/satanaroom/auth/internal/metric"
 	"google.golang.org/grpc"
 )
 

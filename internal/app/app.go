@@ -16,7 +16,7 @@ import (
 	"github.com/satanaroom/auth/internal/closer"
 	"github.com/satanaroom/auth/internal/config"
 	"github.com/satanaroom/auth/internal/interceptor"
-	metric "github.com/satanaroom/auth/internal/metrics"
+	"github.com/satanaroom/auth/internal/metric"
 	accessV1 "github.com/satanaroom/auth/pkg/access_v1"
 	authV1 "github.com/satanaroom/auth/pkg/auth_v1"
 	"github.com/satanaroom/auth/pkg/logger"

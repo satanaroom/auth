@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"time"
 
 	"github.com/satanaroom/auth/internal/model"
 	"github.com/satanaroom/auth/internal/sys"
@@ -24,9 +23,6 @@ func (s *service) Create(ctx context.Context, info *model.UserInfo) (int64, erro
 		return 0, sys.NewCommonError("failed to generate password hash", codes.Internal)
 	}
 	info.User.Password = passwordHash
-
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
 
 	id, err := s.userRepository.Create(ctx, info)
 	if err != nil {
