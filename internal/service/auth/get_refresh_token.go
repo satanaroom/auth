@@ -21,7 +21,7 @@ func (s *service) GetRefreshToken(ctx context.Context, username, password string
 
 	token, err := utils.GenerateToken(&user.User, s.config.RefreshTokenSecretKey(), s.config.RefreshTokenExpiration())
 	if err != nil {
-		return "", sys.NewCommonError("failed to generate token", codes.Internal)
+		return "", sys.NewCommonError(errs.ErrGenerateToken.Error(), codes.Internal)
 	}
 
 	return token, nil

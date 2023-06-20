@@ -33,6 +33,14 @@
         }
       }
     },
+    "auth_v1UpdateRefreshTokenResponse": {
+      "type": "object",
+      "properties": {
+        "newToken": {
+          "type": "string"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {

@@ -10,7 +10,6 @@ var (
 	ErrAccessDenied                     = errors.New("access denied")
 	ErrInvalidToken                     = errors.New("token isn't valid")
 	ErrNoUserByUsername                 = errors.New("no such user")
-	ErrGenerateToken                    = errors.New("generate token unavailable")
+	ErrGenerateToken                    = errors.New("failed to generate token")
 	ErrInvalidPassword                  = errors.New("password isn't valid")
-	ErrPasswordHashGenerating           = errors.New("password hash generating unavailable")
 )
