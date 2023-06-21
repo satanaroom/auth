@@ -12,6 +12,7 @@ var _ Service = (*service)(nil)
 type Service interface {
 	GetRefreshToken(ctx context.Context, username, password string) (string, error)
 	GetAccessToken(ctx context.Context, refreshToken string) (string, error)
+	UpdateRefreshToken(ctx context.Context, oldToken string) (string, error)
 }
 
 type service struct {

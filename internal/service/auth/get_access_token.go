@@ -22,7 +22,7 @@ func (s *service) GetAccessToken(ctx context.Context, refreshToken string) (stri
 
 	accessToken, err := utils.GenerateToken(&user.User, s.config.AccessTokenSecretKey(), s.config.AccessTokenExpiration())
 	if err != nil {
-		return "", sys.NewCommonError("failed to generate token", codes.Internal)
+		return "", sys.NewCommonError(errs.ErrGenerateToken.Error(), codes.Internal)
 	}
 
 	return accessToken, nil
