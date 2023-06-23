@@ -23,4 +23,4 @@ docker-compose up -d
 make build
 ```
 
-Описание API можно найти в вики проекта: https://github.com/satanaroom/auth/wiki/AuthAPI
+Описание API можно найти в вики проекта: https://github.com/satanaroom/auth/wiki
