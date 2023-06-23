@@ -3,6 +3,10 @@ LOCAL_BIN:=$(CURDIR)/bin
 LOCAL_MIGRATION_DIR=./migrations
 LOCAL_MIGRATION_DSN="host=localhost port=54321 dbname=auth user=auth-user password=auth-password sslmode=disable"
 
+.PHONY: build
+build: install-go-deps generate vendor-proto
+	CGO_ENABLED=0 GOOS=linux go build -o bin/auth-api cmd/server/main.go
+
 install-go-deps:
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
