@@ -25,3 +25,15 @@ func NewService(userRepository user.Repository) *service {
 		userRepository: userRepository,
 	}
 }
+func NewMockService(deps ...interface{}) *service {
+	is := service{}
+
+	for _, v := range deps {
+		switch s := v.(type) {
+		case user.Repository:
+			is.userRepository = s
+		}
+	}
+
+	return &is
+}

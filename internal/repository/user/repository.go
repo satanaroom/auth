@@ -1,5 +1,7 @@
 package user
 
+//go:generate mockgen -source=repository.go -destination=internal/repository/user/mocks/mock_user_repository.go
+
 import (
 	"context"
 	"errors"
